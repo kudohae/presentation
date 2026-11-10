@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мои выходные</title>
+<style>
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:500;font-display:block;src:url(fonts/unbounded-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:500;font-display:block;src:url(fonts/unbounded-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:700;font-display:block;src:url(fonts/unbounded-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:700;font-display:block;src:url(fonts/unbounded-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:900;font-display:block;src:url(fonts/unbounded-latin-900-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:900;font-display:block;src:url(fonts/unbounded-cyrillic-900-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+:root{
+  --desk:#1f1c1a; --desk2:#2a2522;
+  --paper:#f3ece0; --paper2:#e9dfcf;
+  --ink:#1d1b19; --red:#d6332a; --green:#2f8f5b; --tape:rgba(214,51,42,.82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--desk);font-family:'Unbounded',sans-serif;color:var(--ink);cursor:default;user-select:none}
+#bg{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;
+  background:
+   radial-gradient(circle at 20% 30%,rgba(255,200,150,.07),transparent 18%),
+   radial-gradient(circle at 70% 60%,rgba(214,51,42,.07),transparent 20%),
+   radial-gradient(circle at 40% 80%,rgba(255,255,255,.05),transparent 15%),
+   radial-gradient(rgba(255,255,255,.05) 1.5px,transparent 1.6px) 0 0/46px 46px;}
+#three{position:fixed;inset:0;width:100%;height:100%;z-index:8;pointer-events:none}
+#vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.6) 100%);z-index:5}
+#world{position:absolute;left:0;top:0;width:6400px;height:4800px;transform-origin:0 0;will-change:transform}
+.abs{position:absolute}
+.card{position:absolute;background:var(--paper);box-shadow:0 30px 60px rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.3);border-radius:4px}
+.hand{font-family:'Caveat',cursive;font-weight:700}
+.tape{position:absolute;width:160px;height:46px;background:var(--tape);box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.torn{clip-path:polygon(0 3%,4% 0,9% 2%,15% 0,22% 3%,30% 0,38% 2%,46% 0,55% 3%,63% 0,71% 2%,80% 0,88% 3%,95% 0,100% 2%,100% 97%,95% 100%,88% 98%,80% 100%,71% 97%,62% 100%,54% 98%,46% 100%,37% 97%,29% 100%,21% 98%,13% 100%,6% 97%,0 100%)}
+.polaroid{background:#fbf8f2;padding:28px 28px 110px}
+.polaroid img,.polaroid video{display:block;width:100%;background:#000}
+#v-hangang{aspect-ratio:16/9}#v-anam{aspect-ratio:9/16}
+.polaroid .label{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:64px}
+
+/* title */
+#title{left:410px;top:240px;width:1100px;height:600px;transform:rotate(-2deg);padding:90px 100px}
+#title h1{font-size:128px;font-weight:900;line-height:1;letter-spacing:-2px}
+#title h1 span{color:var(--red)}
+#title .sub{font-size:70px;margin-top:40px}
+#title .date{position:absolute;right:70px;bottom:60px;font-size:30px;font-weight:500;border:4px solid var(--red);color:var(--red);padding:10px 18px;transform:rotate(-6deg);border-radius:6px}
+
+/* calendar */
+#cal{left:2550px;top:60px;width:1100px;height:760px;transform:rotate(2deg);padding:60px 60px}
+#cal h2{font-size:48px;font-weight:700;margin-bottom:30px}
+#cal h2 small{color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
+.grid .dn{font-size:28px;font-weight:500;text-align:center;opacity:.6;padding-bottom:6px}
+.grid .dn.we{color:var(--red);opacity:1}
+.cell{position:relative;height:210px;background:var(--paper2);border-radius:6px;padding:14px 16px;font-size:44px;font-weight:700}
+.cell.we{color:var(--red)}
+.cell .stamp{position:absolute;left:50%;top:58%;width:96px;height:96px;transform:translate(-50%,-50%)}
+.cell .note{position:absolute;left:4px;right:-30px;top:76px;background:#ffd84d;padding:10px 8px;font-size:40px;color:var(--ink);transform:rotate(-7deg);box-shadow:0 8px 14px rgba(0,0,0,.25);text-align:center}
+#circle{position:absolute;pointer-events:none;overflow:visible}
+
+/* ticket */
+#ticket{left:4560px;top:420px;width:1100px;height:480px;transform:rotate(-3deg);display:flex;overflow:hidden}
+#ticket .l{flex:1;padding:60px 70px;border-right:6px dashed #c9bda9}
+#ticket .r{width:300px;display:flex;align-items:center;justify-content:center;background:var(--red)}
+#ticket .k{font-size:34px;font-weight:500;letter-spacing:6px;opacity:.6}
+#ticket .big{font-size:140px;font-weight:900;line-height:1.1;margin:12px 0}
+#ticket .d{font-size:56px}
+
+/* map */
+#mapwrap{left:4380px;top:1300px;width:1600px;height:1100px;padding:0;overflow:hidden;background:#efe6d6;transform:rotate(1deg)}
+#mapwrap svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+
+/* toilet */
+#stalls{left:1950px;top:2050px;width:1400px;height:640px;padding:60px 70px;transform:rotate(-1.5deg);background:#dcd3c4}
+.doors{display:flex;gap:34px;height:100%}
+.door{position:relative;flex:1;border:7px solid var(--ink);border-radius:10px 10px 0 0;background:var(--paper)}
+.door::before{content:"";position:absolute;left:14px;right:14px;top:14px;height:38%;border:5px solid var(--ink);border-radius:6px;opacity:.35}
+.door .knob{position:absolute;right:22px;top:52%;width:20px;height:20px;border-radius:50%;background:var(--ink)}
+.door .lock{position:absolute;right:16px;top:44%;width:46px;height:30px;border:5px solid var(--ink);border-radius:5px;background:linear-gradient(90deg,var(--green) 50%,var(--red) 50%)}
+.door .hole{position:absolute;right:12px;top:42%;width:56px;height:40px;border:5px dashed var(--red);border-radius:6px}
+.door .x{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);width:90px;height:90px}
+#building{left:3050px;top:2000px;width:760px;height:880px;transform:rotate(2deg);padding:30px 50px 50px;background:#dcd3c4}
+.roof{width:0;height:0;margin:0 auto;border-left:330px solid transparent;border-right:330px solid transparent;border-bottom:120px solid var(--ink)}
+.floors{border:7px solid var(--ink);border-top:none;background:var(--paper)}
+.floor{display:flex;align-items:center;gap:18px;padding:22px 26px;border-top:6px solid var(--ink);height:160px}
+.floor .fn{width:70px;font-size:44px;font-weight:900}
+.mini{position:relative;flex:1;height:110px;border:5px solid var(--ink);border-radius:6px 6px 0 0;background:var(--paper2)}
+.mini .x{position:absolute;inset:16px}
+.mini.ok{background:#d6efd9;border-color:var(--green)}
+.mini .ck{position:absolute;inset:14px}
+#floor1-label{left:3150px;top:2905px;font-size:58px;color:var(--green)}
+#nosmoke{left:3830px;top:1830px;width:400px;height:400px;border-radius:50%;padding:30px}
+
+/* hangang */
+#photo-hangang{left:200px;top:1750px;width:860px;transform:rotate(-4deg)}
+#clock-card{left:1180px;top:1640px;width:560px;height:560px;transform:rotate(5deg);padding:50px}
+#video-hangang{left:520px;top:2520px;width:1220px;transform:rotate(1.5deg)}
+
+/* anam */
+#fest-card{left:180px;top:3520px;width:620px;height:640px;transform:rotate(-5deg);padding:50px;text-align:center}
+#mayor-card{left:900px;top:3430px;width:560px;height:600px;transform:rotate(4deg);padding:40px;text-align:center}
+#chairs-card{left:880px;top:4100px;width:640px;height:560px;transform:rotate(-3deg);padding:40px;text-align:center}
+#video-anam{left:1700px;top:3460px;width:640px;transform:rotate(-2deg)}
+#video-anam .label{font-size:52px}
+
+/* home */
+#home-card{left:3050px;top:3450px;width:700px;height:640px;transform:rotate(3deg);padding:50px;text-align:center}
+#moon-card{left:3880px;top:3300px;width:700px;height:640px;transform:rotate(-4deg);padding:50px;text-align:center;background:#24304a;color:#f3ece0}
+
+.cap{font-size:64px;margin-top:10px}
+
+/* caption strip */
+#caption{position:fixed;left:50%;bottom:5.5vh;z-index:10;
+  background:var(--paper);padding:.55em 1.1em;font-size:clamp(22px,3.1vw,60px);font-weight:700;line-height:1.25;
+  box-shadow:0 18px 40px rgba(0,0,0,.5);text-align:center;white-space:nowrap}
+#caption.hide{opacity:0}
+#caption{font-size:var(--fs,min(3vw,5.2vh,58px));white-space:normal;max-width:90vw;width:max-content;text-wrap:balance}
+#caption .w{display:inline-block;white-space:pre}
+#caption.big{font-size:min(5vw,9vh,100px);font-weight:900;color:var(--red);padding:.3em .9em}
+#caption::before{content:"";position:absolute;left:-28px;top:-14px;width:110px;height:36px;background:var(--tape);transform:rotate(-14deg)}
+
+#progress{position:fixed;right:22px;top:20px;z-index:10;display:flex;gap:6px}
+#progress i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18)}
+#progress i.on{background:rgba(255,255,255,.75)}
+#hint{position:fixed;left:22px;top:18px;z-index:10;color:rgba(255,255,255,.4);font-size:13px;font-weight:500;transition:opacity .6s}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="world">
+
+  <!-- TITLE -->
+  <div class="card torn" id="title">
+    <div class="tape" style="left:-40px;top:20px;transform:rotate(-30deg)"></div>
+    <div class="tape" style="right:-40px;bottom:30px;transform:rotate(-25deg)"></div>
+    <h1>Мои<br><span>выходные</span></h1>
+    <div class="sub hand">Ku Dohae</div>
+    <div class="date">31.10.2026</div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="card" id="cal">
+    <div class="tape" style="left:46%;top:-22px;transform:rotate(3deg)"></div>
+    <h2>Октябрь <small>/</small> Ноябрь</h2>
+    <div class="grid">
+      <div class="dn">Пн</div><div class="dn">Вт</div><div class="dn">Ср</div><div class="dn">Чт</div><div class="dn">Пт</div><div class="dn we">Сб</div><div class="dn we">Вс</div>
+      <div class="cell">26</div><div class="cell">27</div><div class="cell">28</div><div class="cell">29</div><div class="cell">30</div>
+      <div class="cell we" id="d31">31</div><div class="cell we" id="d1">1</div>
+      <div class="cell">2</div>
+      <div class="cell" id="d3">3<div class="note hand" data-in="h2" data-anim="drop">экзамен!</div></div>
+      <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
+      <div class="cell we" id="d7">7
+        <svg class="stamp" viewBox="0 0 100 100" data-in="b1" data-anim="pop"><path d="M10 26 Q30 18 50 28 Q70 18 90 26 V80 Q70 72 50 82 Q30 72 10 80Z" fill="none" stroke="#1d1b19" stroke-width="7" stroke-linejoin="round"/><path d="M50 28 V82" stroke="#1d1b19" stroke-width="7"/></svg>
+      </div>
+      <div class="cell we" id="d8">8
+        <svg class="stamp" viewBox="0 0 100 100" data-in="b1" data-anim="pop"><path d="M10 26 Q30 18 50 28 Q70 18 90 26 V80 Q70 72 50 82 Q30 72 10 80Z" fill="none" stroke="#1d1b19" stroke-width="7" stroke-linejoin="round"/><path d="M50 28 V82" stroke="#1d1b19" stroke-width="7"/></svg>
+      </div>
+    </div>
+    <svg id="circle" viewBox="0 0 320 260" data-in="b2" data-anim="draw">
+      <path d="M40 140 C20 60 140 20 230 40 C320 60 320 190 230 225 C140 255 40 230 30 150 C25 115 50 90 80 80" fill="none" stroke="#d6332a" stroke-width="11" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- TICKET -->
+  <div class="card" id="ticket">
+    <div class="l">
+      <div class="k">ЭКЗАМЕН</div>
+      <div class="big">ADsP</div>
+      <div class="d hand">31.10 · суббота</div>
+    </div>
+    <div class="r">
+      <svg viewBox="0 0 100 200" width="110" data-in="c1" data-anim="pop"><rect x="34" y="20" width="32" height="130" rx="4" fill="#f3ece0"/><polygon points="34,150 66,150 50,185" fill="#f3ece0"/><polygon points="44,170 56,170 50,185" fill="#1d1b19"/><rect x="34" y="20" width="32" height="18" fill="#1d1b19"/></svg>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="card" id="mapwrap">
+    <svg id="mapsvg" viewBox="0 0 1600 1100">
+      <defs><pattern id="grid" width="70" height="70" patternUnits="userSpaceOnUse"><path d="M70 0H0V70" fill="none" stroke="#1d1b19" stroke-opacity=".06" stroke-width="2"/></pattern></defs>
+      <rect width="1600" height="1100" fill="url(#grid)"/>
+      <!-- roads -->
+      <g fill="none" stroke="#fffaf0" stroke-width="22" stroke-linecap="round">
+        <path d="M-20 300 C400 280 900 330 1620 260"/><path d="M180 -20 C210 400 160 700 230 1120"/>
+        <path d="M-20 620 C500 560 1000 640 1620 520"/><path d="M1000 -20 C1030 300 980 600 1050 1120"/>
+        <path d="M480 -20 C470 300 560 700 420 1120"/>
+      </g>
+      <!-- river Han -->
+      <path d="M-40 1070 C380 980 780 1110 1140 1020 S1470 900 1640 760" fill="none" stroke="#8fc3e6" stroke-width="120" stroke-linecap="round"/>
+      <path d="M-40 1070 C380 980 780 1110 1140 1020 S1470 900 1640 760" fill="none" stroke="#a9d3ef" stroke-width="60" stroke-linecap="round" opacity=".7"/>
+      <!-- stream -->
+      <path d="M760 -20 C740 250 820 420 700 620 S590 900 640 1030" fill="none" stroke="#8fc3e6" stroke-width="26" stroke-linecap="round"/>
+      <text x="520" y="1068" font-family="Caveat" font-weight="700" font-size="54" fill="#2c5f86">река Хан</text>
+      <!-- planned route -->
+      <polyline id="routeBase" fill="none" stroke="#1d1b19" stroke-opacity=".35" stroke-width="10" stroke-dasharray="4 22" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- start: Anam -->
+      <g transform="translate(230 230)">
+        <circle r="22" fill="#1d1b19"/><circle r="9" fill="#efe6d6"/>
+        <g transform="translate(-170 -150)">
+          <rect x="20" y="40" width="110" height="80" fill="#f3ece0" stroke="#1d1b19" stroke-width="6"/>
+          <polygon points="10,44 75,0 140,44" fill="#1d1b19"/>
+          <rect x="62" y="80" width="26" height="40" fill="#1d1b19"/>
+          <rect x="34" y="56" width="18" height="18" fill="#1d1b19"/><rect x="98" y="56" width="18" height="18" fill="#1d1b19"/>
+        </g>
+        <text x="-150" y="70" font-family="Unbounded" font-weight="900" font-size="46" fill="#1d1b19">Анам</text>
+      </g>
+      <!-- bus number -->
+      <g transform="translate(420 300)"><rect x="-56" y="-30" width="112" height="60" rx="30" fill="#2b62c9"/><text x="0" y="13" text-anchor="middle" font-family="Unbounded" font-weight="900" font-size="34" fill="#fff">130</text></g>
+      <!-- end: Gwangnaru -->
+      <g transform="translate(1310 895)">
+        <circle r="34" fill="#8a3fb8" stroke="#fff" stroke-width="7"/>
+        <rect x="-14" y="-18" width="28" height="28" rx="6" fill="#fff"/><rect x="-9" y="-13" width="18" height="9" fill="#8a3fb8"/>
+        <circle cx="-7" cy="4" r="3" fill="#8a3fb8"/><circle cx="7" cy="4" r="3" fill="#8a3fb8"/>
+        <path d="M-10 12 L-16 22 M10 12 L16 22" stroke="#fff" stroke-width="4"/>
+        <text x="-150" y="-120" font-family="Unbounded" font-weight="900" font-size="46" fill="#1d1b19">Кваннару</text>
+      </g>
+      <!-- compass -->
+      <g transform="translate(1500 110)"><circle r="54" fill="none" stroke="#1d1b19" stroke-width="5" opacity=".5"/><polygon points="0,-42 14,8 0,0 -14,8" fill="#d6332a"/><text x="0" y="40" text-anchor="middle" font-family="Unbounded" font-weight="700" font-size="22" fill="#1d1b19" opacity=".6">С</text></g>
+      <polyline id="trail" fill="none" stroke="#d6332a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+      <g id="bus"><g data-in="d2" data-anim="pop">
+        <circle r="30" fill="#d6332a" stroke="#fff" stroke-width="6"/>
+        <rect x="-15" y="-15" width="30" height="24" rx="5" fill="#fff"/>
+        <rect x="-11" y="-11" width="22" height="9" fill="#d6332a"/>
+        <circle cx="-8" cy="13" r="4" fill="#fff"/><circle cx="8" cy="13" r="4" fill="#fff"/>
+      </g></g>
+      <g id="school" transform="translate(1300 705)"><g data-in="d3" data-anim="pop" data-origin="50% 100%">
+        <g transform="translate(-75 -150)">
+          <rect x="0" y="0" width="150" height="122" rx="8" fill="#f3ece0" stroke="#1d1b19" stroke-width="6"/>
+          <polygon points="-10,10 75,-45 160,10" fill="#1d1b19"/>
+          <rect x="58" y="72" width="34" height="50" fill="#1d1b19"/>
+          <rect x="18" y="30" width="28" height="26" fill="#1d1b19"/><rect x="104" y="30" width="28" height="26" fill="#1d1b19"/>
+          <rect x="72" y="-80" width="4" height="40" fill="#1d1b19"/><polygon points="76,-80 106,-70 76,-60" fill="#d6332a"/>
+        </g>
+      </g></g>
+    </svg>
+  </div>
+
+  <!-- TOILET -->
+  <div class="card" id="stalls">
+    <div class="doors">
+      <div class="door" id="door1"><div class="knob"></div>
+        <div class="lock" data-out="e2" data-outanim="fly"></div>
+        <div class="hole" data-in="e2" data-anim="pop"></div>
+        <svg class="x" viewBox="0 0 100 100" data-in="e2" data-anim="pop"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg>
+      </div>
+      <div class="door"><div class="knob"></div><div class="hole" data-in="e3" data-anim="pop"></div><svg class="x" viewBox="0 0 100 100" data-in="e3" data-anim="pop"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg></div>
+      <div class="door"><div class="knob"></div><div class="hole" data-in="e3" data-anim="pop"></div><svg class="x" viewBox="0 0 100 100" data-in="e3" data-anim="pop"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg></div>
+      <div class="door"><div class="knob"></div><div class="hole" data-in="e3" data-anim="pop"></div><svg class="x" viewBox="0 0 100 100" data-in="e3" data-anim="pop"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg></div>
+      <div class="door"><div class="knob"></div><div class="hole" data-in="e3" data-anim="pop"></div><svg class="x" viewBox="0 0 100 100" data-in="e3" data-anim="pop"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg></div>
+    </div>
+  </div>
+
+  <div class="card" id="building">
+    <div class="roof"></div>
+    <div class="floors" id="floors"></div>
+  </div>
+  <div class="abs hand" id="floor1-label" data-in="e6" data-anim="pop">1 этаж ✓</div>
+
+  <div class="card" id="nosmoke" data-in="e5" data-anim="pop">
+    <svg viewBox="0 0 200 200" width="100%" height="100%">
+      <rect x="35" y="92" width="110" height="26" fill="#1d1b19"/><rect x="145" y="92" width="22" height="26" fill="#d6332a"/>
+      <path d="M150 80 C140 60 165 55 155 35" fill="none" stroke="#1d1b19" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#d6332a" stroke-width="16"/>
+      <line x1="38" y1="38" x2="162" y2="162" stroke="#d6332a" stroke-width="16"/>
+    </svg>
+  </div>
+
+  <!-- HANGANG -->
+  <div class="card polaroid" id="photo-hangang">
+    <div class="tape" style="left:40%;top:-20px;transform:rotate(-4deg)"></div>
+    <img src="media/hangang.jpg" alt="">
+    <div class="label hand">река Хан</div>
+  </div>
+
+  <div class="card" id="clock-card">
+    <svg viewBox="0 0 200 200" width="100%" data-in="f2" data-anim="pop">
+      <circle cx="100" cy="88" r="72" fill="none" stroke="#1d1b19" stroke-width="10"/>
+      <path id="clock-arc" d="M100 16 A72 72 0 0 1 162 124" fill="none" stroke="#d6332a" stroke-width="10" stroke-linecap="round"/>
+      <line x1="100" y1="88" x2="100" y2="42" stroke="#1d1b19" stroke-width="9" stroke-linecap="round"/>
+      <line x1="100" y1="88" x2="134" y2="106" stroke="#1d1b19" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="100" cy="88" r="8" fill="#1d1b19"/>
+    </svg>
+    <div class="cap hand" style="text-align:center;margin-top:-30px">2 часа</div>
+  </div>
+
+  <div class="card polaroid" id="video-hangang">
+    <video id="v-hangang" src="media/hangang.mp4" preload="auto" playsinline></video>
+    <div class="label hand">«Сумерки» · «Gravity»</div>
+  </div>
+
+  <!-- ANAM -->
+  <div class="card" id="fest-card">
+    <svg viewBox="0 0 200 200" width="78%" data-in="g1" data-anim="pop">
+      <rect x="40" y="50" width="100" height="130" rx="10" fill="#f2b632" stroke="#1d1b19" stroke-width="9"/>
+      <path d="M140 80 h22 a18 18 0 0 1 18 18 v36 a18 18 0 0 1 -18 18 h-22" fill="none" stroke="#1d1b19" stroke-width="9"/>
+      <path d="M34 54 C40 26 70 30 76 40 C86 22 116 24 122 40 C136 30 152 40 146 58 Z" fill="#fff" stroke="#1d1b19" stroke-width="8" stroke-linejoin="round"/>
+      <line x1="70" y1="90" x2="70" y2="160" stroke="#1d1b19" stroke-width="7" opacity=".4"/><line x1="110" y1="90" x2="110" y2="160" stroke="#1d1b19" stroke-width="7" opacity=".4"/>
+    </svg>
+    <div class="cap hand">фестиваль пива</div>
+  </div>
+
+  <div class="card" id="mayor-card">
+    <svg viewBox="0 0 200 200" width="78%" data-in="g2" data-anim="pop">
+      <circle cx="100" cy="46" r="26" fill="#1d1b19"/>
+      <path d="M52 140 V100 a48 34 0 0 1 96 0 V140Z" fill="#1d1b19"/>
+      <path d="M70 80 L132 136" stroke="#d6332a" stroke-width="14"/>
+      <rect x="40" y="128" width="120" height="62" rx="4" fill="#f3ece0" stroke="#1d1b19" stroke-width="8"/>
+      <line x1="100" y1="128" x2="100" y2="96" stroke="#1d1b19" stroke-width="6"/><circle cx="100" cy="92" r="8" fill="#1d1b19"/>
+      <path d="M150 20 l6 14 l15 2 l-11 10 l3 15 l-13 -7 l-13 7 l3 -15 l-11 -10 l15 -2z" fill="#f2b632"/>
+    </svg>
+    <div class="cap hand">глава района</div>
+  </div>
+
+  <div class="card" id="chairs-card">
+    <svg viewBox="0 0 240 170" width="86%" id="chairs-svg"></svg>
+    <div class="cap hand" style="margin-top:0">0 человек</div>
+  </div>
+
+  <div class="card polaroid" id="video-anam">
+    <video id="v-anam" src="media/anam.mp4" preload="auto" playsinline></video>
+    <div class="label hand">Анам · 3 песни</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="card" id="home-card">
+    <svg viewBox="0 0 200 200" width="78%" data-in="h1" data-anim="pop">
+      <path d="M150 40 L120 40 L96 92" fill="none" stroke="#1d1b19" stroke-width="8" stroke-linecap="round"/>
+      <path d="M128 24 L176 44 L160 64 Z" fill="#1d1b19"/>
+      <path d="M176 44 L190 96 L150 70 Z" fill="#f2d44a" opacity=".7"/>
+      <path d="M20 120 Q60 106 100 122 Q140 106 180 120 V178 Q140 164 100 180 Q60 164 20 178Z" fill="#f3ece0" stroke="#1d1b19" stroke-width="8" stroke-linejoin="round"/>
+      <path d="M100 122 V180" stroke="#1d1b19" stroke-width="8"/>
+      <path d="M38 138 h44 M38 152 h36 M118 138 h44 M118 152 h40" stroke="#1d1b19" stroke-width="5" opacity=".4"/>
+    </svg>
+    <div class="cap hand">дома</div>
+  </div>
+
+  <div class="card" id="moon-card">
+    <svg viewBox="0 0 200 200" width="78%" data-in="h3" data-anim="pop">
+      <path d="M120 30 A70 70 0 1 0 170 140 A56 56 0 1 1 120 30Z" fill="#f2d44a"/>
+      <text x="128" y="70" font-family="Unbounded" font-weight="900" font-size="34" fill="#f3ece0">Z</text>
+      <text x="152" y="42" font-family="Unbounded" font-weight="900" font-size="24" fill="#f3ece0">z</text>
+      <text x="170" y="22" font-family="Unbounded" font-weight="900" font-size="16" fill="#f3ece0">z</text>
+    </svg>
+    <div class="cap hand">спокойной ночи</div>
+  </div>
+
+</div>
+
+<div id="vignette"></div>
+<div id="caption" class="hide"></div>
+<div id="progress"></div>
+<div id="hint">→ / Space: дальше · ← : назад · F: полный экран</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="extras.js"></script>
+<script>
+// ---------- generated pictograms ----------
+(function(){
+  const X='<svg class="x" viewBox="0 0 100 100"><path d="M20 20 L80 80 M80 20 L20 80" stroke="#d6332a" stroke-width="14" stroke-linecap="round"/></svg>';
+  const CK='<svg class="ck" viewBox="0 0 100 100"><path d="M18 52 L42 76 L84 26" fill="none" stroke="#2f8f5b" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  let h='';
+  for(let f=4;f>=1;f--){
+    h+='<div class="floor"'+(f===1?' id="floor1"':'')+'><div class="fn">'+f+'</div>';
+    for(let d=0;d<4;d++){
+      if(f===1 && d===0){
+        h+='<div class="mini"><span data-in="e4" data-out="e6" data-anim="pop">'+X+'</span><span data-in="e6" data-anim="pop">'+CK+'</span></div>';
+      } else {
+        h+='<div class="mini"><span data-in="e4" data-anim="pop">'+X+'</span></div>';
+      }
+    }
+    h+='</div>';
+  }
+  document.getElementById('floors').innerHTML=h;
+  // chairs
+  let c='<rect x="20" y="4" width="200" height="22" rx="4" fill="#1d1b19"/>';
+  const chair=(x,y)=>`<g transform="translate(${x} ${y})"><g data-in="g3" data-anim="pop" data-origin="50% 100%"><rect x="0" y="0" width="34" height="30" rx="4" fill="none" stroke="#1d1b19" stroke-width="6"/><line x1="0" y1="30" x2="40" y2="30" stroke="#1d1b19" stroke-width="6"/><line x1="4" y1="30" x2="4" y2="54" stroke="#1d1b19" stroke-width="6"/><line x1="36" y1="30" x2="36" y2="54" stroke="#1d1b19" stroke-width="6"/></g></g>`;
+  for(let r=0;r<2;r++) for(let i=0;i<4;i++) c+=chair(24+i*52+(r?12:0), 50+r*62);
+  document.getElementById('chairs-svg').innerHTML=c;
+})();
+
+// ---------- map route (image coords of 경로.png, 1141x789) ----------
+const ROUTE=[[230,230],[300,150],[360,170],[360,430],[540,510],[720,640],[930,700],[1100,770],[1190,860],[1310,895]];
+const trail=document.getElementById('trail');
+const segLen=[];let totalLen=0;
+for(let i=1;i<ROUTE.length;i++){const d=Math.hypot(ROUTE[i][0]-ROUTE[i-1][0],ROUTE[i][1]-ROUTE[i-1][1]);segLen.push(d);totalLen+=d;}
+trail.setAttribute('points',ROUTE.map(p=>p.join(',')).join(' '));document.getElementById('routeBase').setAttribute('points',ROUTE.map(p=>p.join(',')).join(' '));
+trail.style.strokeDasharray=totalLen; trail.style.strokeDashoffset=totalLen;
+function routeAt(t){let L=t*totalLen;for(let i=0;i<segLen.length;i++){if(L<=segLen[i]||i===segLen.length-1){const k=Math.min(1,L/segLen[i]);return[ROUTE[i][0]+(ROUTE[i+1][0]-ROUTE[i][0])*k,ROUTE[i][1]+(ROUTE[i+1][1]-ROUTE[i][1])*k];}L-=segLen[i];}}
+const bus=document.getElementById('bus');
+function setRoute(t){const p=routeAt(t);bus.setAttribute('transform',`translate(${p[0]} ${p[1]})`);trail.style.strokeDashoffset=totalLen*(1-t);return p;}
+setRoute(0);
+
+// ---------- steps ----------
+const STEPS=[
+ {id:'t0', cam:{el:['#title'],pad:1.15,r:2}, text:''},
+ {id:'b1', cam:{el:['#cal'],pad:1.12,r:-2}, text:'В прошлые выходные я только учился.'},
+ {id:'b2', cam:{el:['#d31','#d1','#d7','#d8'],pad:1.7,r:-3}, text:'Две недели назад…'},
+ {id:'c1', cam:{el:['#ticket'],pad:1.25,r:3}, text:'В субботу я сдавал экзамен.'},
+ {id:'d2', follow:true, text:'Я поехал на автобусе на станцию Кваннару.'},
+ {id:'d3', cam:{el:['#school'],pad:1.7,r:-1}, text:'Экзамен был в средней школе.'},
+ {id:'e1', cam:{el:['#door1'],pad:1.5,r:1.5}, text:'Я пошёл в туалет.'},
+ {id:'e2', cam:{el:['#door1'],pad:1.35,r:-2}, text:'Но замка не было!'},
+ {id:'e3', cam:{el:['#stalls'],pad:1.12,r:1.5}, text:'И здесь тоже… и здесь тоже!'},
+ {id:'e4', cam:{el:['#building'],pad:1.15,r:-2}, text:'На всех этажах!'},
+ {id:'e5', cam:{el:['#building','#nosmoke'],pad:1.1,r:-1}, text:'Почему? Из-за сигарет.'},
+ {id:'e6', cam:{el:['#floor1','#floor1-label'],pad:1.3,r:-2}, text:'На первом этаже всё было нормально.'},
+ {id:'f1', cam:{el:['#photo-hangang'],pad:1.12,r:4}, text:'Потом я играл на гитаре у реки Хан.'},
+ {id:'f2', cam:{el:['#clock-card'],pad:1.3,r:-5}, text:'Мы играли два часа.'},
+ {id:'f3', cam:{el:['#video-hangang'],pad:1.06,r:-1.5}, video:'v-hangang', text:'Я играл «Сумерки» и «Gravity».'},
+ {id:'g1', cam:{el:['#fest-card'],pad:1.25,r:5}, text:'Вечером я играл на пивном фестивале.'},
+ {id:'g2', cam:{el:['#mayor-card'],pad:1.25,r:-4}, text:'Даже глава района пришёл!'},
+ {id:'g3', cam:{el:['#chairs-card'],pad:1.25,r:3}, text:'Но зрителей не было.'},
+ {id:'g4', cam:{el:['#video-anam'],pad:1.06,r:2}, video:'v-anam', text:'Я сыграл три песни.'},
+ {id:'h1', cam:{el:['#home-card'],pad:1.25,r:-3}, text:'Дома я учился.'},
+ {id:'h2', cam:{el:['#d3'],pad:2.4,r:-2}, text:'Во вторник был экзамен.'},
+ {id:'h3', cam:{el:['#moon-card'],pad:1.25,r:4}, text:'Но я очень устал и рано лёг спать.'},
+ {id:'end', cam:{all:true}, text:'Спасибо!', big:true},
+];
+const IDX={};STEPS.forEach((s,i)=>IDX[s.id]=i);
+
+// ---------- camera ----------
+const world=document.getElementById('world'), bg=document.getElementById('bg');
+const cam={x:960,y:540,s:1,r:0};
+const VW=1920,VH=1080;
+function base(){return Math.min(innerWidth/VW,innerHeight/VH);}
+function apply(){
+  const b=base()*cam.s;
+  world.style.transform=`translate(${innerWidth/2}px,${innerHeight/2}px) rotate(${cam.r}deg) scale(${b}) translate(${-cam.x}px,${-cam.y}px)`;
+  bg.style.transform=`translate(${-cam.x*0.12*base()}px,${-cam.y*0.12*base()}px) rotate(${cam.r*0.5}deg)`;
+}
+// measure targets in world coords (with identity transform)
+const RECTS={};
+function rectOf(sel){
+  if(RECTS[sel])return RECTS[sel];
+  const el=document.querySelector(sel);const r=el.getBoundingClientRect();
+  return RECTS[sel]={l:r.left,t:r.top,r:r.right,b:r.bottom};
+}
+function placeCircle(){
+  const a=document.getElementById('d31'),b=document.getElementById('d1'),c=document.getElementById('circle');
+  const l=a.offsetLeft-40,t=a.offsetTop-30,w=b.offsetLeft+b.offsetWidth-a.offsetLeft+80,h=a.offsetHeight+60;
+  Object.assign(c.style,{left:l+'px',top:t+'px',width:w+'px',height:h+'px'});c.setAttribute('preserveAspectRatio','none');
+}
+function measure(){
+  placeCircle();
+  world.style.transform='none';
+  const sels=new Set(['#mapsvg']);
+  STEPS.forEach(s=>s.cam&&s.cam.el&&s.cam.el.forEach(e=>sels.add(e)));
+  document.querySelectorAll('#world > .card').forEach(e=>sels.add('#'+e.id));
+  // temporarily show everything so rects are real
+  const hidden=[...document.querySelectorAll('[data-in],[data-out]')];
+  const prev=hidden.map(e=>e.style.cssText);
+  hidden.forEach(e=>{e.style.opacity=1;e.style.transform='';});
+  sels.forEach(s=>rectOf(s));
+  hidden.forEach((e,i)=>e.style.cssText=prev[i]);
+}
+function camFor(step){
+  const c=step.cam;
+  if(c.all){let l=1e9,t=1e9,r=-1e9,b=-1e9;document.querySelectorAll('#world > .card').forEach(e=>{const q=rectOf('#'+e.id);l=Math.min(l,q.l);t=Math.min(t,q.t);r=Math.max(r,q.r);b=Math.max(b,q.b);});
+    const s=Math.min(VW*0.94/(r-l),VH*0.72/(b-t));return {x:(l+r)/2,y:(t+b)/2+(VH*0.13)/s,s,r:0};}
+  let l=1e9,t=1e9,r=-1e9,b=-1e9;
+  c.el.forEach(sel=>{const q=rectOf(sel);l=Math.min(l,q.l);t=Math.min(t,q.t);r=Math.max(r,q.r);b=Math.max(b,q.b);});
+  const w=r-l,h=b-t,pad=c.pad||1.2;
+  const availH=VH*0.80; // leave room for caption
+  const s=Math.min(VW/(w*pad),availH/(h*pad));
+  return {x:(l+r)/2, y:(t+b)/2 + (VH*0.085)/s, s, r:c.r||0};
+}
+let camTween=null;
+function flyTo(T,dur=1.6,onDone){
+  if(camTween)camTween.kill();
+  const A={...cam};
+  const dist=Math.hypot(T.x-A.x,T.y-A.y)*Math.min(A.s,T.s); // in screen px at the smaller zoom
+  const la=Math.log(A.s), lb=Math.log(T.s);
+  // zoom-out amount grows gently with distance; 0 for short moves
+  const dip=Math.max(0,Math.log(Math.max(1,dist/(VW*0.55))))*0.9;
+  const D=dur*(1+Math.min(0.6,dip*0.35));
+  const o={t:0};
+  camTween=gsap.to(o,{t:1,duration:D,ease:'sine.inOut',onUpdate:()=>{
+    const t=o.t;
+    // position follows a smootherstep so it lags at the ends while zoom eases
+    const u=t*t*t*(t*(t*6-15)+10);
+    cam.x=A.x+(T.x-A.x)*u; cam.y=A.y+(T.y-A.y)*u;
+    cam.s=Math.exp(la+(lb-la)*t - dip*4*t*(1-t));
+    cam.r=A.r+(T.r-A.r)*t;
+    apply();
+  },onComplete:onDone});
+}
+function mapPoint(p){const q=rectOf('#mapsvg');const k=(q.r-q.l)/1600;return{x:q.l+p[0]*k,y:q.t+p[1]*k};}
+
+// ---------- element states ----------
+const els=[...document.querySelectorAll('[data-in],[data-out]')];
+function visibleAt(el,i){
+  const a=el.dataset.in!=null?IDX[el.dataset.in]:-1;
+  const o=el.dataset.out!=null?IDX[el.dataset.out]:1e9;
+  return i>=a && i<o;
+}
+function showEl(el,instant,delay){
+  const kind=el.dataset.anim||'pop';
+  if(kind==='none')return;
+  if(kind==='draw'){
+    el.querySelectorAll('path').forEach(p=>{const L=p.getTotalLength();p.style.strokeDasharray=L;
+      instant?gsap.set(p,{strokeDashoffset:0}):gsap.fromTo(p,{strokeDashoffset:L},{strokeDashoffset:0,duration:1.1,delay:delay+0.6,ease:'power2.inOut'});});
+    gsap.set(el,{opacity:1});return;
+  }
+  if(instant){gsap.set(el,{opacity:1,scale:1,y:0,x:0,rotation:0});return;}
+  if(kind==='drop') gsap.fromTo(el,{opacity:0,y:-80,rotation:-20},{opacity:1,y:0,rotation:0,duration:.7,delay,ease:'back.out(2)'});
+  else gsap.fromTo(el,{opacity:0,scale:.3},{opacity:1,scale:1,transformOrigin:el.dataset.origin||'50% 50%',duration:.6,delay,ease:'back.out(2.2)'});
+}
+function hideEl(el,instant){
+  if((el.dataset.anim||'')==='none')return;
+  if(instant){gsap.set(el,{opacity:0});return;}
+  if(el.dataset.outanim==='fly') gsap.to(el,{x:260,y:-420,rotation:540,transformOrigin:'50% 50%',opacity:0,duration:1,ease:'power2.in',delay:.5});
+  else gsap.to(el,{opacity:0,scale:.6,duration:.3});
+}
+function applyStates(i,instant){
+  let k=0;
+  els.forEach(el=>{
+    const v=visibleAt(el,i), was=el._v;
+    if(v===was)return;
+    el._v=v;
+    if(v){ showEl(el,instant, instant?0:0.9+(k++)*0.07); }
+    else hideEl(el,instant);
+  });
+}
+
+// ---------- caption ----------
+const cap=document.getElementById('caption');
+gsap.set(cap,{xPercent:-50,rotation:-1});
+// shrink until it fits on one line; if it still can't (very narrow screen), allow two balanced lines
+function fitCap(){
+  cap.style.setProperty('--fs','');cap.style.whiteSpace='nowrap';
+  let fs=parseFloat(getComputedStyle(cap).fontSize);const min=fs*0.72;let g=0;
+  while(cap.scrollWidth>innerWidth*0.9&&fs>min&&g++<40){fs*=0.96;cap.style.setProperty('--fs',fs+'px');}
+  if(cap.scrollWidth>innerWidth*0.9) cap.style.whiteSpace='normal';
+}
+function setCaption(text,big,instant){
+  gsap.killTweensOf(cap); gsap.killTweensOf(cap.querySelectorAll('.w'));
+  if(!text){ gsap.to(cap,{opacity:0,y:30,duration:.3,onComplete:()=>cap.classList.add('hide')}); return; }
+  const out=cap.classList.contains('hide')?0:.25;
+  gsap.to(cap,{opacity:0,y:20,duration:out,onComplete:()=>{
+    cap.classList.remove('hide');cap.classList.toggle('big',!!big);
+    cap.innerHTML=text.split(' ').map(w=>`<span class="w">${w} </span>`).join('').replace(/ <\/span>$/,'</span>');
+    cap.style.setProperty('--fs','');gsap.set(cap,{opacity:1,y:0});
+    fitCap();
+    gsap.fromTo(cap,{scaleX:.85},{scaleX:1,duration:.5,ease:'back.out(2)'});
+    gsap.fromTo(cap.querySelectorAll('.w'),{opacity:0,y:24,filter:'blur(10px)'},{opacity:1,y:0,filter:'blur(0px)',duration:.55,stagger:.07,ease:'power2.out',delay:instant?0:.35});
+  }});
+}
+
+// ---------- video ----------
+const videos=[...document.querySelectorAll('video')];
+function stopVideos(except){videos.forEach(v=>{if(v.id!==except){v.pause();}});}
+
+// ---------- navigation ----------
+let cur=-1, busy=false;
+const prog=document.getElementById('progress');
+prog.innerHTML=STEPS.map(()=>'<i></i>').join('');
+function go(i,instant){
+  i=Math.max(0,Math.min(STEPS.length-1,i));
+  if(i===cur&&!instant)return;
+  const forward=i>cur; cur=i;
+  const st=STEPS[i];
+  [...prog.children].forEach((d,k)=>d.classList.toggle('on',k<=i));
+  stopVideos(st.video);
+  if(window.EXTRAS) EXTRAS.show(st.id);
+  applyStates(i,instant);
+  setCaption(st.text,st.big,instant);
+  if(st.follow){
+    const p0=mapPoint(ROUTE[0]); const S=2.0;
+    const startCam={x:p0.x,y:p0.y+ (VH*0.085)/S,s:S,r:-3};
+    const run=()=>{const o={t:0};camTween=gsap.to(o,{t:1,duration:3.6,ease:'power1.inOut',onUpdate:()=>{
+        const p=setRoute(o.t);const w=mapPoint(p);cam.x=w.x;cam.y=w.y+(VH*0.085)/cam.s;cam.r=-3+o.t*3;apply();}});};
+    setRoute(0);
+    if(instant){setRoute(1);const w=mapPoint(ROUTE[ROUTE.length-1]);Object.assign(cam,{x:w.x,y:w.y+(VH*0.085)/S,s:S,r:0});apply();}
+    else flyTo(startCam,1.5,run);
+  } else {
+    if(IDX[st.id]>IDX['d2']) setRoute(1); else if(IDX[st.id]<IDX['d2']) setRoute(0);
+    const T=camFor(st);
+    if(instant){Object.assign(cam,T);apply();} else flyTo(T, st.cam.all?2.2:1.6);
+  }
+  if(st.video){const v=document.getElementById(st.video);v.currentTime=0;v.muted=false;
+    setTimeout(()=>{if(STEPS[cur].video===st.video)v.play().catch(()=>{});}, instant?0:1400);}
+  try{history.replaceState(null,'','#'+(i+1));}catch(e){}
+}
+function next(){go(cur+1);hideHint();}
+function prev(){go(cur-1);hideHint();}
+const hint=document.getElementById('hint');
+let hintT=setTimeout(hideHint,6000);
+function hideHint(){hint.style.opacity=0;}
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' ','Enter','ArrowDown'].includes(e.key)){e.preventDefault();next();}
+  else if(['ArrowLeft','PageUp','ArrowUp','Backspace'].includes(e.key)){e.preventDefault();prev();}
+  else if(e.key==='Home'){go(0);}
+  else if(e.key==='End'){go(STEPS.length-1);}
+  else if(e.key==='f'||e.key==='F'||e.key==='а'||e.key==='А'){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+});
+addEventListener('click',e=>{ if(e.button===0) next(); });
+addEventListener('contextmenu',e=>{e.preventDefault();prev();});
+addEventListener('resize',()=>{apply();if(!cap.classList.contains('hide'))fitCap();});
+
+// ---------- start ----------
+function start(){
+  measure();
+  els.forEach(el=>{el._v=undefined;});
+  const h=parseInt((location.hash||'#1').slice(1))||1;
+  els.forEach(el=>{const v=visibleAt(el,h-1);el._v=v; if(!v) gsap.set(el,{opacity:0}); else showEl(el,true,0);});
+  cur=-1; go(h-1,true);
+}
+document.fonts.ready.then(()=>{ requestAnimationFrame(start); });
+</script>
+</body>
+</html>
