@@ -92,13 +92,17 @@ function setOdo(el,text,tl,at){
   cols.forEach((c,i)=>{const y=-(+ds[i]*.9)+'em'; if(tl) tl.to(c.firstChild,{y,duration:1.4,ease:IO},at+i*.07); else gsap.set(c.firstChild,{y});});
 }
 function counter(tl,el,from,to,dur,at,ease){const o={v:from};tl.to(o,{v:to,duration:dur,ease:ease||'power3.out',onUpdate:()=>el.textContent=Math.round(o.v)},at);}
-function prep(paths){paths.forEach(p=>{const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;});}
-function draw(tl,paths,dur,at,st){tl.to(paths,{strokeDashoffset:0,duration:dur,ease:'power2.inOut',stagger:st||0},at);}
+function prep(paths){paths.forEach(p=>{const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.opacity=0;});}
+function draw(tl,paths,dur,at,st){tl.set(paths,{opacity:1},at);tl.to(paths,{strokeDashoffset:0,duration:dur,ease:'power2.inOut',stagger:st||0},at);}
 function rise(tl,els,at,dy){tl.fromTo(els,{y:dy||50,opacity:0},{y:0,opacity:1,duration:1.1,ease:OUT,stagger:.08},at);}
 function wipe(tl,frame,at){const inner=frame.querySelector('img,video');
   tl.fromTo(frame,{clipPath:'inset(100% 0% 0% 0% round 28px)'},{clipPath:'inset(0% 0% 0% 0% round 28px)',duration:1.3,ease:IO},at);
   tl.fromTo(inner,{scale:1.2},{scale:1.02,duration:2.2,ease:OUT},at);}
 
+// SVG camera: animates the viewBox so the view can follow, push in and pull back
+function setVB(S){const c=S.cam,w=c.h*S.R;S.svg.setAttribute('viewBox',`${c.cx-w/2} ${c.cy-c.h/2} ${w} ${c.h}`);}
+function camTo(tl,S,to,dur,at,ease){tl.to(S.cam,{...to,duration:dur,ease:ease||IO,onUpdate:()=>setVB(S)},at);}
+const SOFT='linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 6%,#000 94%,transparent)';
 const NS='http://www.w3.org/2000/svg', INK='#141417';
 function door(missing){
   const g=document.createElementNS(NS,'g');
@@ -126,7 +130,7 @@ const SCENES={
  map:{build(S){
    S.box=$(`<div class="area" style="top:430px;height:670px"></div>`);layer.appendChild(S.box);
    const pts=ROUTE.map(p=>p.join(',')).join(' ');
-   S.svg=$(`<svg viewBox="60 90 1560 960" width="1380" height="670" preserveAspectRatio="xMidYMid meet" style="overflow:visible">
+   S.svg=$(`<svg width="1380" height="670" style="overflow:hidden;-webkit-mask-image:${SOFT};-webkit-mask-composite:source-in;mask-image:${SOFT};mask-composite:intersect">
      <path d="M-60 1070 C380 980 780 1110 1140 1020 S1470 900 1660 760" fill="none" stroke="#bcd8ec" stroke-width="130" stroke-linecap="round"/>
      <path d="M760 -40 C740 250 820 420 700 620 S590 900 640 1030" fill="none" stroke="#bcd8ec" stroke-width="30" stroke-linecap="round"/>
      <text x="380" y="1050" font-size="40" fill="#4a7395" letter-spacing="6">РЕКА ХАН</text>
@@ -139,7 +143,8 @@ const SCENES={
        <path d="M1200 710 V600 L1310 520 L1420 600 V710 Z"/><path d="M1288 710 V655 H1332 V710"/><path d="M1235 615 H1270 M1350 615 H1385"/><path d="M1310 520 V455 L1355 472 L1310 489"/>
      </g>
    </svg>`);S.box.appendChild(S.svg);
-   S.tag=$(`<div class="label" style="position:absolute;right:0;top:0">автобус 130</div>`);S.box.appendChild(S.tag);
+   S.tag=$(`<div class="label" style="position:absolute;right:110px;top:400px">автобус 130</div>`);layer.appendChild(S.tag);
+   S.R=1380/670;S.cam={cx:230,cy:260,h:440};setVB(S);
    S.route=S.svg.querySelector('.route');S.bus=S.svg.querySelector('.bus');S.school=[...S.svg.querySelectorAll('.school path')];
    S.A=S.svg.querySelector('.a');S.B=S.svg.querySelector('.b');S.Bt=S.svg.querySelector('.b text');
    S.L=S.route.getTotalLength();S.route.style.strokeDasharray=S.L;S.route.style.strokeDashoffset=S.L;
@@ -147,7 +152,8 @@ const SCENES={
  }},
  wc:{build(S){
    S.box=$(`<div class="area" style="top:490px;height:610px"></div>`);layer.appendChild(S.box);
-   S.svg=document.createElementNS(NS,'svg');S.svg.setAttribute('viewBox','0 0 1380 610');S.svg.setAttribute('width','1380');S.svg.setAttribute('height','610');S.svg.style.overflow='visible';S.box.appendChild(S.svg);
+   S.svg=document.createElementNS(NS,'svg');S.svg.setAttribute('viewBox','0 0 1380 610');S.svg.setAttribute('width','1380');S.svg.setAttribute('height','610');S.svg.style.cssText=`overflow:hidden;-webkit-mask-image:${SOFT};-webkit-mask-composite:source-in;mask-image:${SOFT};mask-composite:intersect`;S.box.appendChild(S.svg);
+   S.R=1380/610;S.cam={cx:690,cy:305,h:610};setVB(S);
    S.doors=[];
    for(let f=0;f<3;f++)for(let c=0;c<4;c++){const d=door(!(f===0&&c===0));d.dataset.f=f;d.dataset.c=c;S.svg.appendChild(d);S.doors.push(d);gsap.set(d,{transformOrigin:'50% 50%',opacity:0,x:690,y:305,scale:1.55});}
    S.first=S.doors[0];
@@ -163,7 +169,7 @@ const SCENES={
    S.svg.appendChild(S.cig);S.cigP=[...S.cig.querySelectorAll('path,circle')];prep(S.cigP);
  }},
  han:{build(S){
-   S.photo=$(`<div class="frame" style="left:110px;top:470px;width:1380px;height:620px"><img src="media/hangang.jpg" style="object-position:50% 45%"></div>`);layer.appendChild(S.photo);
+   S.photo=$(`<div class="frame" style="left:110px;top:470px;width:1380px;height:620px"><div class="kb" style="width:100%;height:100%"><img src="media/hangang.jpg" style="object-position:50% 45%"></div></div>`);layer.appendChild(S.photo);
    S.shade=$(`<div style="position:absolute;inset:0;background:rgba(10,10,14,.62);opacity:0"></div>`);S.photo.appendChild(S.shade);
    S.cnt=$(`<div style="position:absolute;left:110px;top:470px;width:1380px;height:620px;display:flex;align-items:baseline;justify-content:center;gap:34px;padding-top:120px;color:#fff;opacity:0"><div class="big" style="font-size:420px">0</div><div style="font:800 110px/1 'Inter Tight'">часа</div></div>`);layer.appendChild(S.cnt);S.num=S.cnt.firstChild;
    S.video=$(`<div class="frame" style="left:249px;top:470px;width:1102px;height:620px;opacity:0"><video src="media/hangang.mp4" preload="auto" playsinline></video></div>`);layer.appendChild(S.video);
@@ -208,17 +214,22 @@ const STEPS=[
    run(tl,S){swapLabel(tl,S.lab,'суббота',0);tl.to(S.date,{fontSize:190,duration:1.1,ease:IO},.1);tl.fromTo(S.ads,{opacity:0,y:80},{opacity:1,y:0,duration:1.1,ease:OUT},.55);}},
  {id:'d2',scene:'map',text:'Я поехал на автобусе на станцию <em>Кваннару</em>.',hl:'sm',
    run(tl,S){rise(tl,[S.tag,S.A],.3,20);tl.to(S.bus,{opacity:1,duration:.3},.6);
-     const o={t:0};tl.to(o,{t:1,duration:3.2,ease:'power2.inOut',onUpdate:()=>{const L=S.L*o.t;S.route.style.strokeDashoffset=S.L-L;const p=S.route.getPointAtLength(L);S.bus.setAttribute('cx',p.x);S.bus.setAttribute('cy',p.y);}},.7);
-     rise(tl,S.B,3.4,20);}},
+     // camera rides with the bus, then pulls back to show the whole route
+     const o={t:0};tl.to(o,{t:1,duration:3.4,ease:'power2.inOut',onUpdate:()=>{const L=S.L*o.t;S.route.style.strokeDashoffset=S.L-L;const p=S.route.getPointAtLength(L);S.bus.setAttribute('cx',p.x);S.bus.setAttribute('cy',p.y);S.cam.cx=p.x;S.cam.cy=p.y+30;setVB(S);}},.7);
+     tl.to(S.cam,{h:560,duration:3.4,ease:'power1.inOut'},.7);
+     camTo(tl,S,{cx:840,cy:590,h:1010},1.7,4.0);
+     rise(tl,S.B,4.5,20);}},
  {id:'d3',scene:'map',text:'Экзамен был в <em>средней школе</em>.',hl:'sm',
-   run(tl,S){tl.to([S.bus,S.Bt],{opacity:0,duration:.4},0);draw(tl,S.school,1.2,.3,.12);}},
+   run(tl,S){tl.to([S.bus,S.Bt],{opacity:0,duration:.4},0);camTo(tl,S,{cx:1290,cy:620,h:470},1.6,.1);draw(tl,S.school,1.2,.7,.12);}},
  {id:'e1',scene:'wc',chapter:'02|Случай в туалете',text:'Я пошёл в <em>туалет</em>.',
    run(tl,S){tl.fromTo(S.first,{opacity:0,y:345},{opacity:1,y:305,duration:1.2,ease:OUT},.3);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',
    run(tl,S){const l=S.first.querySelector('.latch');
-     tl.to(l,{y:-40,opacity:0,duration:.5,ease:'power2.in'},.3).add(()=>{l.setAttribute('fill','none');l.setAttribute('stroke','#e0362a');l.setAttribute('stroke-dasharray','7 6');}).to(l,{y:0,opacity:1,duration:.6,ease:OUT});}},
+     camTo(tl,S,{cx:760,cy:295,h:290},1.4,.1);
+     tl.to(l,{y:-30,opacity:0,duration:.5,ease:'power2.in'},1.2).add(()=>{l.setAttribute('fill','none');l.setAttribute('stroke','#e0362a');l.setAttribute('stroke-dasharray','7 6');}).to(l,{y:0,opacity:1,duration:.6,ease:OUT});}},
  {id:'e3',scene:'wc',text:'И здесь тоже… и здесь <em>тоже</em>!',
-   run(tl,S){[0,1,2,3].forEach((n,c)=>{const d=S.doors[n],x=690+(c-1.5)*270;
+   run(tl,S){camTo(tl,S,{cx:690,cy:305,h:610},1.2,0);
+     [0,1,2,3].forEach((n,c)=>{const d=S.doors[n],x=690+(c-1.5)*270;
      if(c===0)tl.to(d,{x,y:330,scale:1.1,duration:1.1,ease:IO},.1);else tl.fromTo(d,{opacity:0,x:x+80,y:330,scale:1.1},{opacity:1,x,duration:1.0,ease:OUT},.55+c*.14);});
      rise(tl,S.rowLab,.9,10);}},
  {id:'e4',scene:'wc',text:'На третьем и втором этаже <em>тоже</em>!',
@@ -233,7 +244,7 @@ const STEPS=[
      rise(tl,S.labels[3],.7,10);tl.fromTo(S.teacher,{opacity:0,y:552},{opacity:1,y:522,duration:1.0,ease:OUT},.7);
      tl.fromTo(S.teacher.querySelector('.latch'),{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},1.2);rise(tl,S.tlab,1.3,10);}},
  {id:'f1',scene:'han',chapter:'03|Музыка',text:'Потом я играл на гитаре у <em>реки Хан</em>.',hl:'sm',
-   run(tl,S){wipe(tl,S.photo,.2);}},
+   run(tl,S){wipe(tl,S.photo,.2);gsap.fromTo(S.photo.querySelector('.kb'),{scale:1,xPercent:0},{scale:1.1,xPercent:-2,duration:14,ease:'sine.inOut',delay:1.6});}},
  {id:'f2',scene:'han',text:'Мы играли <em>два часа</em>.',
    run(tl,S){tl.to(S.shade,{opacity:1,duration:.8},.1);tl.to(S.cnt,{opacity:1,duration:.3},.4);counter(tl,S.num,0,2,1.6,.4,'power2.out');}},
  {id:'f3',scene:'han',text:'Я играл «Сумерки» и <em>«Gravity»</em>.',hl:'sm',video:'v',
