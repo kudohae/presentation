@@ -149,8 +149,11 @@ const SCENES={
    S.box=$(`<div class="area" style="top:490px;height:610px"></div>`);layer.appendChild(S.box);
    S.svg=document.createElementNS(NS,'svg');S.svg.setAttribute('viewBox','0 0 1380 610');S.svg.setAttribute('width','1380');S.svg.setAttribute('height','610');S.svg.style.overflow='visible';S.box.appendChild(S.svg);
    S.doors=[];
-   for(let f=0;f<4;f++)for(let c=0;c<4;c++){const d=door(!(f===3&&c===0));d.dataset.f=f;d.dataset.c=c;S.svg.appendChild(d);S.doors.push(d);gsap.set(d,{transformOrigin:'50% 50%',opacity:0,x:690,y:305,scale:1.55});}
-   S.first=S.doors[12];
+   for(let f=0;f<3;f++)for(let c=0;c<4;c++){const d=door(!(f===0&&c===0));d.dataset.f=f;d.dataset.c=c;S.svg.appendChild(d);S.doors.push(d);gsap.set(d,{transformOrigin:'50% 50%',opacity:0,x:690,y:305,scale:1.55});}
+   S.first=S.doors[0];
+   S.teacher=door(false);const tl0=S.teacher.querySelector('.latch');tl0.setAttribute('fill','#1f9d55');tl0.setAttribute('stroke','#1f9d55');S.svg.appendChild(S.teacher);gsap.set(S.teacher,{transformOrigin:'50% 50%',opacity:0,x:690,y:522,scale:.4});
+   S.tlab=document.createElementNS(NS,'text');S.tlab.setAttribute('x','760');S.tlab.setAttribute('y','538');S.tlab.setAttribute('font-size','44');S.tlab.setAttribute('fill','#1f9d55');S.tlab.textContent='для учителей';S.svg.appendChild(S.tlab);gsap.set(S.tlab,{opacity:0});
+   S.rowLab=document.createElementNS(NS,'text');S.rowLab.setAttribute('x','690');S.rowLab.setAttribute('y','82');S.rowLab.setAttribute('text-anchor','middle');S.rowLab.setAttribute('font-size','44');S.rowLab.setAttribute('fill',INK);S.rowLab.textContent='4 этаж';S.svg.appendChild(S.rowLab);gsap.set(S.rowLab,{opacity:0});
    S.labels=[];for(let f=0;f<4;f++){const t=document.createElementNS(NS,'text');t.setAttribute('x','300');t.setAttribute('y',String(94+f*148));t.setAttribute('font-size','44');t.setAttribute('fill',INK);t.textContent=(4-f);S.svg.appendChild(t);S.labels.push(t);gsap.set(t,{opacity:0});}
    S.cig=document.createElementNS(NS,'g');S.cig.setAttribute('transform','translate(690 305) scale(1.1) translate(-410 -420)');
    S.cig.innerHTML=`<g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="10">
@@ -158,7 +161,6 @@ const SCENES={
      <path d="M560 410 C540 370 600 350 575 300 C555 260 610 240 590 200" stroke="#8a8a90"/>
      <circle cx="410" cy="420" r="240" stroke="#e0362a" stroke-width="18"/><path d="M240 250 L580 590" stroke="#e0362a" stroke-width="18"/></g>`;
    S.svg.appendChild(S.cig);S.cigP=[...S.cig.querySelectorAll('path,circle')];prep(S.cigP);
-   S.check=document.createElementNS(NS,'path');S.check.setAttribute('d','M357 548 L383 574 L433 508');S.check.setAttribute('fill','none');S.check.setAttribute('stroke','#1f9d55');S.check.setAttribute('stroke-width','14');S.check.setAttribute('stroke-linecap','round');S.check.setAttribute('stroke-linejoin','round');S.svg.appendChild(S.check);prep([S.check]);
  }},
  han:{build(S){
    S.photo=$(`<div class="frame" style="left:110px;top:470px;width:1380px;height:620px"><img src="media/hangang.jpg" style="object-position:50% 45%"></div>`);layer.appendChild(S.photo);
@@ -210,25 +212,26 @@ const STEPS=[
      rise(tl,S.B,3.4,20);}},
  {id:'d3',scene:'map',text:'Экзамен был в <em>средней школе</em>.',hl:'sm',
    run(tl,S){tl.to([S.bus,S.Bt],{opacity:0,duration:.4},0);draw(tl,S.school,1.2,.3,.12);}},
- {id:'e1',scene:'wc',chapter:'02|Туалет',text:'Я пошёл в <em>туалет</em>.',
+ {id:'e1',scene:'wc',chapter:'02|Случай в туалете',text:'Я пошёл в <em>туалет</em>.',
    run(tl,S){tl.fromTo(S.first,{opacity:0,y:345},{opacity:1,y:305,duration:1.2,ease:OUT},.3);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',
    run(tl,S){const l=S.first.querySelector('.latch');
      tl.to(l,{y:-40,opacity:0,duration:.5,ease:'power2.in'},.3).add(()=>{l.setAttribute('fill','none');l.setAttribute('stroke','#e0362a');l.setAttribute('stroke-dasharray','7 6');}).to(l,{y:0,opacity:1,duration:.6,ease:OUT});}},
  {id:'e3',scene:'wc',text:'И здесь тоже… и здесь <em>тоже</em>!',
-   run(tl,S){[12,13,14,15].forEach((n,c)=>{const d=S.doors[n],x=690+(c-1.5)*270;
-     if(c===0)tl.to(d,{x,y:305,scale:1.1,duration:1.1,ease:IO},.1);else tl.fromTo(d,{opacity:0,x:x+80,y:305,scale:1.1},{opacity:1,x,duration:1.0,ease:OUT},.55+c*.14);});}},
- {id:'e4',scene:'wc',text:'На <em>всех</em> этажах!',
-   run(tl,S){S.doors.forEach(d=>{const f=+d.dataset.f,c=+d.dataset.c,x=690+(c-1.5)*200,y=78+f*148;
-       if(f===3)tl.to(d,{x,y,scale:.4,duration:1.1,ease:IO},.1);else tl.fromTo(d,{opacity:0,x,y:y-30,scale:.4},{opacity:1,y,duration:.9,ease:OUT},.7+(2-f)*.14+c*.04);});
-     rise(tl,S.labels,1.0,10);}},
+   run(tl,S){[0,1,2,3].forEach((n,c)=>{const d=S.doors[n],x=690+(c-1.5)*270;
+     if(c===0)tl.to(d,{x,y:330,scale:1.1,duration:1.1,ease:IO},.1);else tl.fromTo(d,{opacity:0,x:x+80,y:330,scale:1.1},{opacity:1,x,duration:1.0,ease:OUT},.55+c*.14);});
+     rise(tl,S.rowLab,.9,10);}},
+ {id:'e4',scene:'wc',text:'На третьем и втором этаже <em>тоже</em>!',
+   run(tl,S){tl.to(S.rowLab,{opacity:0,duration:.3},0);
+     S.doors.forEach(d=>{const f=+d.dataset.f,c=+d.dataset.c,x=690+(c-1.5)*200,y=78+f*148;
+       if(f===0)tl.to(d,{x,y,scale:.4,duration:1.1,ease:IO},.1);else tl.fromTo(d,{opacity:0,x,y:y-30,scale:.4},{opacity:1,y,duration:.9,ease:OUT},.6+f*.45+c*.05);});
+     [0,1,2].forEach(f=>rise(tl,S.labels[f],.7+f*.45,10));}},
  {id:'e5',scene:'wc',text:'Почему? Из-за <em>сигарет</em>.',
-   run(tl,S){tl.to([...S.doors,...S.labels],{opacity:.1,duration:.7,ease:'power2.out'},.1);draw(tl,S.cigP,1.2,.4,.1);}},
- {id:'e6',scene:'wc',text:'На <em>первом</em> этаже всё было нормально.',hl:'sm',
-   run(tl,S){tl.to(S.cigP,{opacity:0,duration:.5},0);tl.to(S.labels,{opacity:1,duration:.6},.3);
-     S.doors.forEach(d=>tl.to(d,{opacity:+d.dataset.f===3?1:.15,duration:.7},.3));
-     const l=S.first.querySelector('.latch');tl.add(()=>{l.setAttribute('fill','#1f9d55');l.setAttribute('stroke','#1f9d55');l.removeAttribute('stroke-dasharray');},.9);
-     tl.fromTo(l,{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},.9);draw(tl,[S.check],.6,1.2);}},
+   run(tl,S){tl.to([...S.doors,...S.labels.slice(0,3)],{opacity:.1,duration:.7,ease:'power2.out'},.1);draw(tl,S.cigP,1.2,.4,.1);}},
+ {id:'e6',scene:'wc',text:'Замок был только в туалете <em>для учителей</em>.',hl:'sm',
+   run(tl,S){tl.to(S.cigP,{opacity:0,duration:.5},0);tl.to(S.doors,{opacity:.22,duration:.7},.3);tl.to(S.labels.slice(0,3),{opacity:.4,duration:.7},.3);
+     rise(tl,S.labels[3],.7,10);tl.fromTo(S.teacher,{opacity:0,y:552},{opacity:1,y:522,duration:1.0,ease:OUT},.7);
+     tl.fromTo(S.teacher.querySelector('.latch'),{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},1.2);rise(tl,S.tlab,1.3,10);}},
  {id:'f1',scene:'han',chapter:'03|Музыка',text:'Потом я играл на гитаре у <em>реки Хан</em>.',hl:'sm',
    run(tl,S){wipe(tl,S.photo,.2);}},
  {id:'f2',scene:'han',text:'Мы играли <em>два часа</em>.',
