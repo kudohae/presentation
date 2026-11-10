@@ -404,7 +404,7 @@ const stage=document.getElementById('stage'),chap=document.getElementById('chapt
 const cbigSp=cbig.querySelectorAll('span');
 function fit(){const k=Math.min(innerWidth/1600,innerHeight/1200);stage.style.transform=`translate(-50%,-50%) scale(${k})`;}
 fit();addEventListener('resize',fit);
-gsap.set(cbigSp,{yPercent:115});
+gsap.set(cbigSp,{yPercent:170});
 
 let cur=-1,S=null,sceneName=null,hlEl=null,tlNow=null,curChapter='';
 const chapterOf=i=>{for(let k=i;k>=0;k--)if(STEPS[k].chapter!==undefined)return STEPS[k].chapter;return '';};
@@ -419,8 +419,8 @@ function setChapter(c,instant){
 function chapterIn(tl,c,at){const [n,t]=c.split('|');cbigSp[0].textContent=n;cbigSp[1].textContent=t;
   tl.to(chap,{opacity:0,duration:.25},at);
   tl.to(root,{...FLASH,duration:.3,ease:'power2.out'},at);tl.add(()=>setChapter(c,true),at+.3);
-  tl.fromTo(cbigSp,{yPercent:115},{yPercent:0,duration:.9,ease:OUT,stagger:.08},at+.12);
-  tl.to(cbigSp,{yPercent:-115,duration:.4,ease:'power2.in',stagger:.04},at+1.3);
+  tl.fromTo(cbigSp,{yPercent:170},{yPercent:0,duration:.9,ease:OUT,stagger:.08},at+.12);
+  tl.to(cbigSp,{yPercent:-170,duration:.4,ease:'power2.in',stagger:.04},at+1.3);
   tl.to(root,{...LIGHT,duration:.35,ease:'power2.inOut'},at+1.55);
   tl.to(chap,{opacity:1,duration:.4},at+1.8);
   return at+1.9;}
@@ -498,7 +498,7 @@ function go(i,opts={}){
     out.add(()=>{setChapter(newCh,chapterChange);tlNow=playStep(i,true);},playAt);
     tlNow=out;
   } else {
-    gsap.set(cbigSp,{yPercent:115});gsap.set(chap,{opacity:1});gsap.set(root,LIGHT);
+    gsap.set(cbigSp,{yPercent:170});gsap.set(chap,{opacity:1});gsap.set(root,LIGHT);
     buildScene(st.scene);setChapter(newCh,true);
     let k=i;while(k>0&&STEPS[k-1].scene===st.scene)k--;
     for(let j=k;j<=i;j++)playStep(j,false);
