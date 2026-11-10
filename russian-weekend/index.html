@@ -76,7 +76,7 @@ svg text{font-family:'Inter';font-weight:600}
 const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstElementChild;};
 const layer=document.getElementById('layer'), root=document.documentElement;
 const OUT='expo.out', IO='expo.inOut';
-const LIGHT={'--bg':'#f6f4f0','--fg':'#141417','--dim':'#4d4d55'}, NIGHT={'--bg':'#10142a','--fg':'#f2f2f5','--dim':'#a3a8c3'};
+const LIGHT={'--bg':'#f6f4f0','--fg':'#141417','--dim':'#4d4d55','--accent':'#e0362a'}, FLASH={'--bg':'#e0362a','--fg':'#ffffff','--dim':'#ffd6d0','--accent':'#f6f4f0'}, NIGHT={'--bg':'#10142a','--fg':'#f2f2f5','--dim':'#a3a8c3'};
 
 function headline(html,cls){
   html=html.replace(/<em>(.*?)<\/em>/g,(m,t)=>t.split(' ').map(w=>`<em>${w}</em>`).join(' '));
@@ -123,6 +123,9 @@ function door(missing){
    <circle cx="66" cy="16" r="9" fill="${INK}"/>
    <rect class="latch" x="44" y="-24" width="44" height="26" rx="6" fill="${missing?'none':INK}" stroke="${missing?RED:INK}" stroke-width="4" ${missing?'stroke-dasharray="7 6"':''} vector-effect="non-scaling-stroke"/>`);
 }
+// draw a path while the camera rides its head (used for walking down the building)
+function follow(tl,C,path,dur,at,ease){const L=path.getTotalLength(),o={t:0};tl.set(path,{opacity:1},at);
+  tl.to(o,{t:1,duration:dur,ease:ease||'sine.inOut',onUpdate:()=>{const l=L*o.t;path.style.strokeDashoffset=L-l;const p=path.getPointAtLength(l);C.cam.cx=p.x*.55;C.cam.cy=p.y-190;setVB(C);}},at);}
 function smooth(pts){let d=`M${pts[0][0]} ${pts[0][1]}`;
   for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
     d+=` C${p1[0]+(p2[0]-p0[0])/6} ${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6} ${p2[1]-(p3[1]-p1[1])/6} ${p2[0]} ${p2[1]}`;}
@@ -227,10 +230,16 @@ const SCENES={
    S.tag=$(`<div class="label" style="position:absolute;right:110px;top:400px;opacity:0">такси</div>`);layer.appendChild(S.tag);
    S.box=$(`<div class="area" style="top:520px;height:580px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end"></div>`);layer.appendChild(S.box);
    S.lab=$(`<div class="label" style="margin-bottom:34px;opacity:0">Анам · 31.10</div>`);S.box.appendChild(S.lab);
-   S.time=$(`<div class="big" style="color:var(--accent);opacity:0">21:00</div>`);S.box.appendChild(S.time);
-   S.badge=$(`<div style="position:absolute;left:110px;top:640px;display:inline-flex;align-items:center;gap:40px;padding:52px 70px;border:6px solid var(--fg);border-radius:999px;opacity:0">
-       <svg viewBox="0 0 100 100" width="110" height="110"><circle cx="50" cy="50" r="46" fill="${RED}"/><path class="ck" d="M28 52 L44 68 L73 34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-       <span style="font:800 110px/1 'Inter Tight';letter-spacing:-.03em">глава района</span></div>`);layer.appendChild(S.badge);S.ck=[S.badge.querySelector('.ck')];prep(S.ck);
+   S.time=$(`<div class="big" style="color:var(--accent);opacity:0">18:00</div>`);S.box.appendChild(S.time);
+   S.badge=$(`<div style="position:absolute;left:110px;top:470px;display:inline-flex;align-items:center;gap:32px;padding:40px 56px;border:6px solid var(--fg);border-radius:999px;opacity:0">
+       <svg viewBox="0 0 100 100" width="90" height="90"><circle cx="50" cy="50" r="46" fill="${RED}"/><path class="ck" d="M28 52 L44 68 L73 34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+       <span style="font:800 84px/1 'Inter Tight';letter-spacing:-.03em">глава района</span></div>`);layer.appendChild(S.badge);S.ck=[S.badge.querySelector('.ck')];prep(S.ck);
+   // the district head pops up from the bottom edge
+   S.head=$(`<img src="media/head.png" style="position:absolute;left:830px;top:520px;height:680px;opacity:0;transform-origin:50% 100%">`);layer.appendChild(S.head);
+   S.spark=$(`<svg viewBox="0 0 1600 1200" width="1600" height="1200" style="position:absolute;left:0;top:0;pointer-events:none" fill="none" stroke="${RED}" stroke-width="9" stroke-linecap="round">
+       <path d="M1040 545 L1000 505"/><path d="M1028 585 L975 580"/><path d="M1065 520 L1055 468"/>
+       <path d="M1462 565 L1502 525"/><path d="M1472 605 L1527 600"/><path d="M1440 540 L1450 488"/></svg>`);layer.appendChild(S.spark);
+   S.sparkP=[...S.spark.querySelectorAll('path')];prep(S.sparkP);
    S.few=$(`<div class="area" style="top:470px;height:630px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;opacity:0">
        <div class="label" style="margin-bottom:34px">около</div><div class="big" style="font-size:470px">0</div><div class="label" style="margin-top:28px">зрителей</div></div>`);layer.appendChild(S.few);S.fn=S.few.children[1];
    S.dots=$(`<div style="position:absolute;left:110px;top:760px;display:grid;grid-template-columns:repeat(5,70px);gap:34px"></div>`);layer.appendChild(S.dots);
@@ -268,7 +277,7 @@ const STEPS=[
    run(tl,S){tl.to(W.dot,{opacity:0,duration:.4},0);camTo(tl,W,CAM.SCH,1.6,.1);draw(tl,W.school,1.2,.7,.12);}},
  // school door → toilet door: the camera pushes into the door and the cut lands on the stall door
  {id:'e1',scene:'wc',chapter:'02|Случай в туалете',text:'Я пошёл в <em>туалет</em>.',bat:4,
-   pre(out){camTo(out,W,{cx:1290,cy:593,h:76.3},1.5,0,'power3.inOut');out.to(W.el,{opacity:0,duration:.35},1.35);return 1.3;},
+   flashAt:1.05,pre(out){camTo(out,W,{cx:1290,cy:593,h:76.3},1.5,0,'power3.inOut');out.to(W.el,{opacity:0,duration:.35},1.35);return 1.3;},
    onBuild(S){gsap.fromTo(S.first,{opacity:0},{opacity:1,duration:.3});},
    run(tl,S){tl.set(S.first,{opacity:1},0);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',bat:4,
@@ -278,26 +287,29 @@ const STEPS=[
    run(tl,S){camTo(tl,S,{cx:0,cy:200,h:520},1.2,0);tl.to(S.struct,{opacity:1,duration:.8},.4);
      S.rows[0].slice(1).forEach((d,c)=>tl.fromTo(d,{opacity:0,x:-130+c*260+60},{opacity:1,x:-130+c*260,duration:.9,ease:OUT},.55+c*.16));
      rise(tl,S.rowLab,.9,10);draw(tl,[S.track[0]],1.4,.6);}},
- {id:'e4',scene:'wc',text:'На третьем и втором этаже <em>тоже</em>!',bat:3,batAt:2.6,
+ {id:'e4',scene:'wc',text:'На третьем и втором этаже <em>тоже</em>!',bat:3,batAt:3.6,
    run(tl,S){tl.to(S.rowLab,{opacity:0,duration:.3},0);
-     camTo(tl,S,{cy:620},1.0,.1,'power2.inOut');draw(tl,[S.track[1]],.6,.1);draw(tl,[S.track[2]],.8,.7,0,'none');
-     tl.fromTo([...S.rows[1]].reverse(),{opacity:0},{opacity:1,duration:.3,stagger:.18},.75);
-     camTo(tl,S,{cy:1040},1.0,1.45,'power2.inOut');draw(tl,[S.track[3]],.6,1.45);draw(tl,[S.track[4]],.8,2.05,0,'none');
-     tl.fromTo(S.rows[2],{opacity:0},{opacity:1,duration:.3,stagger:.18},2.1);
-     camTo(tl,S,{cx:-60,cy:600,h:1400},1.4,3.0);rise(tl,S.flab.slice(0,3),3.4,30);}},
+     // the camera walks with the red line: stairs, along floor 3, stairs, along floor 2
+     camTo(tl,S,{cx:275,cy:212,h:520},.6,0,'power2.inOut');
+     follow(tl,S,S.track[1],.8,.5);follow(tl,S,S.track[2],1.2,1.3);
+     tl.fromTo([...S.rows[1]].reverse(),{opacity:0},{opacity:1,duration:.3,stagger:.26},1.4);
+     follow(tl,S,S.track[3],.8,2.5);follow(tl,S,S.track[4],1.2,3.3);
+     tl.fromTo(S.rows[2],{opacity:0},{opacity:1,duration:.3,stagger:.26},3.4);
+     camTo(tl,S,{cx:-60,cy:600,h:1400},1.4,4.6);rise(tl,S.flab.slice(0,3),5.0,30);}},
  {id:'e5',scene:'wc',text:'Почему? Из-за <em>сигарет</em>.',bat:3,
    run(tl,S){tl.to(S.bldg,{opacity:.1,duration:.7,ease:'power2.out'},.1);draw(tl,S.cigP,1.2,.4,.1);}},
  {id:'e6',scene:'wc',text:'Замок был только в туалете <em>для учителей</em>.',hl:'sm',bat:3,
    run(tl,S){tl.to(S.cigP,{opacity:0,duration:.5},0);tl.to(S.bldg,{opacity:1,duration:.6},.3);tl.to(S.doors,{opacity:.3,duration:.6},.3);
-     // whole building first, then down to the ground floor where the one lock was
-     camTo(tl,S,{cx:-60,cy:820,h:1840},1.3,.2);draw(tl,[S.track[5]],.5,.9);rise(tl,S.flab[3],1.0,30);
-     camTo(tl,S,{cx:-110,cy:1490,h:480},1.5,1.9);draw(tl,[S.track[6]],.8,2.2,0,'power2.out');
-     tl.fromTo(S.teacher,{opacity:0},{opacity:1,duration:.6},2.7);
-     tl.fromTo(S.teacher.querySelector('.latch'),{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},3.1);rise(tl,S.tlab,3.2,20);}},
+     // back to the end of the line, then follow it down to the ground floor and the one locked door
+     camTo(tl,S,{cx:275,cy:1052,h:520},1.1,.2);rise(tl,S.flab[3],.6,30);
+     follow(tl,S,S.track[5],.8,1.3);follow(tl,S,S.track[6],1.0,2.1,'power2.out');
+     camTo(tl,S,{cx:-110,cy:1490,h:480},.9,3.0,'power2.inOut');
+     tl.fromTo(S.teacher,{opacity:0},{opacity:1,duration:.6},2.8);
+     tl.fromTo(S.teacher.querySelector('.latch'),{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},3.4);rise(tl,S.tlab,3.5,20);}},
  // back on the map: the metro from Gwangnaru to Jayang, the station pin opens into the photo
  {id:'f1',scene:'han',chapter:'03|Музыка',text:'Потом я играл на гитаре у <em>реки Хан</em>.',hl:'sm',bat:3,
-   pre(out){camSet(out,W,CAM.G,.3);out.to(W.el,{opacity:1,duration:.7},.6);},
-   run(tl,S){tl.set(W.el,{opacity:1},0);rise(tl,S.tag,.2,20);tl.set(W.dot,{attr:{cx:G[0],cy:G[1]}},0);
+   pre(out){camSet(out,W,CAM.G,.3);},
+   run(tl,S){tl.to(W.el,{opacity:1,duration:.6},0);rise(tl,S.tag,.2,20);tl.set(W.dot,{attr:{cx:G[0],cy:G[1]}},0);
      drive(tl,1,.4,3.0,600);tl.fromTo(W.stn,{opacity:0,scale:.3},{opacity:1,scale:1,duration:.4,ease:'back.out(2)',stagger:.5},.85);
      rise(tl,W.pins[2],3.2,15);tl.to(W.dot,{opacity:0,duration:.3},3.5);
      tl.set(S.photo,{opacity:1},3.75);
@@ -315,16 +327,18 @@ const STEPS=[
      drive(tl,2,.6,3.0,600);tl.to(W.dot,{opacity:0,duration:.3},3.7);
      tl.to(W.el,{opacity:.1,duration:.8},3.8);tl.to(S.tag,{opacity:0,duration:.4},3.8);rise(tl,[S.lab,S.time],4.0);}},
  {id:'g2',scene:'fest',text:'Даже <em>глава района</em> пришёл!',bat:2,
-   run(tl,S){tl.to(W.el,{opacity:0,duration:.5},0);tl.to(S.box,{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.fromTo(S.badge,{opacity:0,scale:.92,y:40},{opacity:1,scale:1,y:0,duration:1.1,ease:OUT},.45);draw(tl,S.ck,.5,1.0);}},
+   run(tl,S){tl.to(W.el,{opacity:0,duration:.5},0);tl.to(S.box,{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.fromTo(S.badge,{opacity:0,scale:.92,y:40},{opacity:1,scale:1,y:0,duration:1.1,ease:OUT},.45);draw(tl,S.ck,.5,1.0);
+     tl.set(S.head,{opacity:1},.8);tl.fromTo(S.head,{yPercent:100,rotation:-5},{yPercent:0,rotation:0,duration:.95,ease:'back.out(1.6)'},.8);
+     draw(tl,S.sparkP,.3,1.55,.05,'power2.out');}},
  {id:'g3',scene:'fest',text:'Но зрителей было <em>мало</em>.',bat:2,
-   run(tl,S){tl.to(S.badge,{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.to(S.few,{opacity:1,duration:.3},.5);counter(tl,S.fn,0,10,1.6,.5,'power3.out');
+   run(tl,S){tl.to(S.badge,{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.to(S.head,{yPercent:100,duration:.5,ease:'power2.in'},0);tl.to(S.sparkP,{opacity:0,duration:.3},0);tl.to(S.few,{opacity:1,duration:.3},.5);counter(tl,S.fn,0,10,1.6,.5,'power3.out');
      tl.fromTo(S.dots.children,{opacity:0,scale:.4},{opacity:1,scale:1,duration:.5,ease:'back.out(2)',stagger:.12},.55);}},
  {id:'g4',scene:'fest',text:'Я сыграл <em>три песни</em>.',hl:'side',lay:{side:true},video:'v',bat:1,batAt:2.2,
    run(tl,S){tl.to([S.few,S.dots],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.35);wipe(tl,S.video,.35);}},
  // the whole loop of the day closes at home
  {id:'h1',scene:'home',chapter:'04|Дом',text:'<em>Дома</em> я учился.',bat:1,
-   pre(out){camSet(out,W,CAM.A,.3);out.to(W.el,{opacity:1,duration:.7},.6);},
-   run(tl,S){tl.set(W.el,{opacity:1},0);camTo(tl,W,CAM.LOOP,1.9,.2);draw(tl,W.house,1.0,1.1,.15);rise(tl,W.hlab,1.7,15);}},
+   pre(out){camSet(out,W,CAM.A,.3);},
+   run(tl,S){tl.to(W.el,{opacity:1,duration:.6},0);camTo(tl,W,CAM.LOOP,1.9,.2);draw(tl,W.house,1.0,1.1,.15);rise(tl,W.hlab,1.7,15);}},
  {id:'h2',scene:'home',text:'Во <em>вторник</em> был экзамен.',bat:1,
    run(tl,S){tl.to(W.el,{opacity:0,duration:.5},0);rise(tl,[S.lab,S.date],.5);swapLabel(tl,S.lab,'вторник · экзамен',1.5);setOdo(S.date,'03.11',tl,1.6);}},
  {id:'h3',scene:'home',text:'Но я очень устал и <em>рано лёг спать</em>.',hl:'sm',bat:0,batAt:.6,
@@ -367,15 +381,20 @@ function setChapter(c,instant){
   gsap.to(chap.firstChild,{yPercent:-110,duration:.4,ease:'power2.in',onComplete:()=>{chap.innerHTML=chapterHTML(c);gsap.fromTo(chap.firstChild,{yPercent:110},{yPercent:0,duration:.8,ease:OUT});}});
 }
 // big chapter title in the headline zone, over whatever is moving underneath
+// chapter change: the whole theme flips to red for a moment, the chapter title sits on it, then it flips back
 function chapterIn(tl,c,at){const [n,t]=c.split('|');cbigSp[0].textContent=n;cbigSp[1].textContent=t;
-  tl.to(chap,{opacity:0,duration:.3},at);tl.to(chap,{opacity:1,duration:.4},at+1.7);
-  tl.fromTo(cbigSp,{yPercent:115},{yPercent:0,duration:.9,ease:OUT,stagger:.08},at);
-  tl.to(cbigSp,{yPercent:-115,duration:.45,ease:'power2.in',stagger:.04},at+1.25);}
+  tl.to(chap,{opacity:0,duration:.25},at);
+  tl.to(root,{...FLASH,duration:.3,ease:'power2.out'},at);tl.add(()=>setChapter(c,true),at+.3);
+  tl.fromTo(cbigSp,{yPercent:115},{yPercent:0,duration:.9,ease:OUT,stagger:.08},at+.12);
+  tl.to(cbigSp,{yPercent:-115,duration:.4,ease:'power2.in',stagger:.04},at+1.3);
+  tl.to(root,{...LIGHT,duration:.35,ease:'power2.inOut'},at+1.55);
+  tl.to(chap,{opacity:1,duration:.4},at+1.8);
+  return at+1.9;}
 // battery: one cell blinks out when energy is spent
 let batLevel=null,batTl=null;
 function setBat(n,anim,delay){const cells=[...bat.querySelectorAll('.cell')],body=bat.querySelector('.body');
   if(batTl){batTl.progress(1);batTl=null;}
-  const paint=()=>{cells.forEach((c,k)=>{c.style.opacity=k<n?1:0;c.style.background=n<=1?RED:'';});body.style.borderColor=n===0?RED:'';};
+  const paint=()=>{cells.forEach((c,k)=>{c.style.opacity=k<n?1:0;c.style.background=n<=1?'var(--accent)':'';});body.style.borderColor=n===0?'var(--accent)':'';};
   if(n===null){gsap.to(bat,{opacity:0,duration:anim?.4:0});batLevel=null;return;}
   if(batLevel===null){paint();gsap.to(bat,{opacity:1,duration:anim?.6:0,delay:anim?.8:0});}
   else if(anim&&n<batLevel){const c=cells[n];batTl=gsap.timeline({delay}).to(c,{opacity:.15,duration:.16,repeat:3,yoyo:true}).to(c,{opacity:0,duration:.3}).add(paint);}
@@ -411,18 +430,25 @@ function go(i,opts={}){
   gsap.to(bar,{scaleX:i/(STEPS.length-1),duration:1.2,ease:IO});
   const forwardOne=(i===prev+1)&&!opts.instant;
   const newCh=chapterOf(i), chapterChange=newCh!==curChapter&&newCh!=='';
-  if(forwardOne&&st.scene===sceneName){
+  if(forwardOne&&st.scene===sceneName&&chapterChange){
+    // chapter starts inside the same scene (01): what is on screen stays, only the colour flips
+    const out=gsap.timeline();
+    if(hlEl){hideWords(out,hlEl,0);hlEl=null;}
+    const end=chapterIn(out,newCh,.3);
+    out.add(()=>{setChapter(newCh,true);tlNow=playStep(i,true);},end);
+    tlNow=out;
+  } else if(forwardOne&&st.scene===sceneName){
     setChapter(newCh);tlNow=playStep(i,true);
   } else if(forwardOne){
     const out=gsap.timeline();
     if(hlEl)hideWords(out,hlEl,0);
     out.to(layer.children,{opacity:0,y:-30,duration:.45,ease:'power2.in',stagger:.03},0);
-    out.to(root,{...themeFor(i),duration:.5},0);
+    if(!chapterChange)out.to(root,{...themeFor(i),duration:.5},0);
     let buildAt=.55,playAt=.55;
     if(st.pre){const b=st.pre(out);if(b!==undefined)buildAt=b;}
-    if(chapterChange){chapterIn(out,newCh,.35);playAt=Math.max(buildAt,2.0)+.05;}else playAt=buildAt;
+    if(chapterChange){playAt=Math.max(buildAt,chapterIn(out,newCh,st.flashAt||.3))+.05;}else playAt=buildAt;
     out.add(()=>{buildScene(st.scene);if(st.onBuild)st.onBuild(S);},buildAt);
-    out.add(()=>{setChapter(newCh);tlNow=playStep(i,true);},playAt);
+    out.add(()=>{setChapter(newCh,chapterChange);tlNow=playStep(i,true);},playAt);
     tlNow=out;
   } else {
     gsap.set(cbigSp,{yPercent:115});gsap.set(chap,{opacity:1});gsap.set(root,LIGHT);
