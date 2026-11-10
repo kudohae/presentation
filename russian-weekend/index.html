@@ -60,7 +60,7 @@ svg text{font-family:'Inter';font-weight:600}
   <div id="layer"></div>
   <div id="chapter"><span></span></div>
   <div id="bar"></div>
-  <div id="card"><div class="n"><span>01</span></div><div class="t"><span>Пролог</span></div></div>
+  <div id="card"><div class="n"><span>01</span></div><div class="t"><span>Экзамен</span></div></div>
 </div>
 
 <script src="vendor/gsap.min.js"></script>
@@ -198,11 +198,11 @@ const SCENES={
 const STEPS=[
  {id:'t0',scene:'title',chapter:'',text:'Мои выходные',hl:'xl',lay:{top:390},
    run(tl,S){rise(tl,S.eb,0,20);tl.to(S.line,{scaleX:1,duration:1.3,ease:IO},.55);rise(tl,S.name,.9,20);}},
- {id:'b1',scene:'cal',chapter:'01|Пролог',text:'В прошлые выходные я <em>только</em> учился.',
+ {id:'b1',scene:'cal',chapter:'',text:'В прошлые выходные я <em>только</em> учился.',
    run(tl,S){rise(tl,[S.lab,S.date],.25);}},
  {id:'b2',scene:'cal',text:'<em>Две недели</em> назад…',
    run(tl,S){swapLabel(tl,S.lab,'октябрь',0);setOdo(S.date,'31.10',tl,.1);}},
- {id:'c1',scene:'cal',chapter:'02|Экзамен',text:'В субботу я сдавал <em>экзамен</em>.',
+ {id:'c1',scene:'cal',chapter:'01|Экзамен',text:'В субботу я сдавал <em>экзамен</em>.',
    run(tl,S){swapLabel(tl,S.lab,'суббота',0);tl.to(S.date,{fontSize:190,duration:1.1,ease:IO},.1);tl.fromTo(S.ads,{opacity:0,y:80},{opacity:1,y:0,duration:1.1,ease:OUT},.55);}},
  {id:'d2',scene:'map',text:'Я поехал на автобусе на станцию <em>Кваннару</em>.',hl:'sm',
    run(tl,S){rise(tl,[S.tag,S.A],.3,20);tl.to(S.bus,{opacity:1,duration:.3},.6);
@@ -210,7 +210,7 @@ const STEPS=[
      rise(tl,S.B,3.4,20);}},
  {id:'d3',scene:'map',text:'Экзамен был в <em>средней школе</em>.',hl:'sm',
    run(tl,S){tl.to([S.bus,S.Bt],{opacity:0,duration:.4},0);draw(tl,S.school,1.2,.3,.12);}},
- {id:'e1',scene:'wc',chapter:'03|Туалет',text:'Я пошёл в <em>туалет</em>.',
+ {id:'e1',scene:'wc',chapter:'02|Туалет',text:'Я пошёл в <em>туалет</em>.',
    run(tl,S){tl.fromTo(S.first,{opacity:0,y:345},{opacity:1,y:305,duration:1.2,ease:OUT},.3);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',
    run(tl,S){const l=S.first.querySelector('.latch');
@@ -229,7 +229,7 @@ const STEPS=[
      S.doors.forEach(d=>tl.to(d,{opacity:+d.dataset.f===3?1:.15,duration:.7},.3));
      const l=S.first.querySelector('.latch');tl.add(()=>{l.setAttribute('fill','#1f9d55');l.setAttribute('stroke','#1f9d55');l.removeAttribute('stroke-dasharray');},.9);
      tl.fromTo(l,{scale:.3,transformOrigin:'50% 50%'},{scale:1,duration:.6,ease:'back.out(3)'},.9);draw(tl,[S.check],.6,1.2);}},
- {id:'f1',scene:'han',chapter:'04|Музыка',text:'Потом я играл на гитаре у <em>реки Хан</em>.',hl:'sm',
+ {id:'f1',scene:'han',chapter:'03|Музыка',text:'Потом я играл на гитаре у <em>реки Хан</em>.',hl:'sm',
    run(tl,S){wipe(tl,S.photo,.2);}},
  {id:'f2',scene:'han',text:'Мы играли <em>два часа</em>.',
    run(tl,S){tl.to(S.shade,{opacity:1,duration:.8},.1);tl.to(S.cnt,{opacity:1,duration:.3},.4);counter(tl,S.num,0,2,1.6,.4,'power2.out');}},
@@ -244,7 +244,7 @@ const STEPS=[
      tl.fromTo(S.dots.children,{opacity:0,scale:.4},{opacity:1,scale:1,duration:.5,ease:'back.out(2)',stagger:.12},.55);}},
  {id:'g4',scene:'fest',text:'Я сыграл <em>три песни</em>.',hl:'side',lay:{side:true},video:'v',
    run(tl,S){tl.to([S.few,S.dots],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.35);wipe(tl,S.video,.35);}},
- {id:'h1',scene:'home',chapter:'05|Дом',text:'<em>Дома</em> я учился.',
+ {id:'h1',scene:'home',chapter:'04|Дом',text:'<em>Дома</em> я учился.',
    run(tl,S){rise(tl,[S.lab,S.date],.3);}},
  {id:'h2',scene:'home',text:'Во <em>вторник</em> был экзамен.',
    run(tl,S){swapLabel(tl,S.lab,'вторник · экзамен',0);setOdo(S.date,'03.11',tl,.2);}},
