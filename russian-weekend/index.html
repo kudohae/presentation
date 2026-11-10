@@ -35,6 +35,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #bat{position:absolute;right:110px;top:88px;display:flex;align-items:center;opacity:0}
 #bat .body{width:120px;height:52px;border:5px solid var(--fg);border-radius:12px;padding:5px;display:flex;gap:5px}
 #bat .cell{flex:1;background:var(--fg);border-radius:3px}
+#bat{position:absolute}#bat .bolt{position:absolute;left:47px;top:5px;opacity:0}
 #bat .nub{width:8px;height:20px;background:var(--fg);border-radius:0 4px 4px 0;margin-left:3px}
 #world{position:absolute;left:110px;top:430px;width:1380px;height:670px;opacity:0}
 
@@ -67,7 +68,7 @@ svg text{font-family:'Inter';font-weight:600}
   <div id="layer"></div>
   <div id="cbig"><div class="n"><span>02</span></div><div class="t"><span></span></div></div>
   <div id="chapter"><span></span></div>
-  <div id="bat"><div class="body"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div><div class="nub"></div></div>
+  <div id="bat"><div class="body"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div><div class="nub"></div><svg class="bolt" viewBox="0 0 24 40" width="26" height="42"><path d="M15 1 L3 23 H11 L8 39 L21 15 H13 Z" fill="#f2d44a" stroke="#10142a" stroke-width="2.5" stroke-linejoin="round"/></svg></div>
   <div id="bar"></div>
 </div>
 
@@ -188,6 +189,11 @@ const SCENES={
    S.lab=$(`<div class="label" style="margin-bottom:34px;height:32px;overflow:hidden"><span style="display:block">ноябрь</span></div>`);S.box.appendChild(S.lab);
    S.date=odo('08.11','big');S.box.appendChild(S.date);
    S.ads=$(`<div style="position:absolute;left:0;bottom:0;font:800 300px/.9 'Inter Tight';letter-spacing:-.05em;color:var(--accent);opacity:0">ADsP</div>`);S.box.appendChild(S.ads);
+   // tape rewind: scanlines, a tracking band and ◀◀
+   S.rw=$(`<div style="position:absolute;inset:0;pointer-events:none;opacity:0">
+     <div class="sl" style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(20,20,23,.07) 0 3px,transparent 3px 9px)"></div>
+     <div class="band" style="position:absolute;left:0;right:0;top:0;height:54px;background:rgba(20,20,23,.09)"></div>
+     <svg viewBox="0 0 120 60" width="170" height="85" style="position:absolute;left:110px;top:960px"><path d="M58 4 L8 30 L58 56 Z M112 4 L62 30 L112 56 Z" fill="${RED}"/></svg></div>`);layer.appendChild(S.rw);
  }},
  map:{build(S){
    S.tag=$(`<div class="label" style="position:absolute;right:110px;top:400px;opacity:0">автобус 130</div>`);layer.appendChild(S.tag);
@@ -225,8 +231,9 @@ const SCENES={
    S.photo=$(`<div class="frame" style="left:110px;top:470px;width:1380px;height:620px;opacity:0"><div class="kb" style="width:100%;height:100%"><img src="media/hangang.jpg" style="object-position:50% 45%"></div></div>`);layer.appendChild(S.photo);
    S.shade=$(`<div style="position:absolute;inset:0;background:rgba(10,10,14,.62);opacity:0"></div>`);S.photo.appendChild(S.shade);
    S.cnt=$(`<div style="position:absolute;left:110px;top:470px;width:1380px;height:620px;display:flex;align-items:baseline;justify-content:center;gap:34px;padding-top:120px;color:#fff;opacity:0"><div class="big" style="font-size:420px">0</div><div style="font:800 110px/1 'Inter Tight'">часа</div></div>`);layer.appendChild(S.cnt);S.num=S.cnt.firstChild;
-   S.video=$(`<div class="frame" style="left:249px;top:470px;width:1102px;height:620px;opacity:0"><video src="media/hangang.mp4" preload="auto" playsinline></video></div>`);layer.appendChild(S.video);
+   S.video=$(`<div class="frame" style="left:267px;top:440px;width:1067px;height:600px;opacity:0"><video src="media/hangang.mp4" preload="auto" playsinline></video></div>`);layer.appendChild(S.video);
    S.v=S.video.querySelector('video');
+   S.wave=$(`<canvas width="1067" height="44" style="position:absolute;left:267px;top:1054px;opacity:0"></canvas>`);layer.appendChild(S.wave);S.v._wave=S.wave;
  }},
  fest:{build(S){
    S.tag=$(`<div class="label" style="position:absolute;right:110px;top:400px;opacity:0">такси</div>`);layer.appendChild(S.tag);
@@ -248,6 +255,7 @@ const SCENES={
    for(let i=0;i<10;i++)S.dots.appendChild($(`<div style="width:70px;height:70px;border-radius:50%;background:var(--fg);opacity:0"></div>`));
    S.video=$(`<div class="frame" style="left:984px;top:150px;width:506px;height:900px;opacity:0"><video src="media/anam.mp4" preload="auto" playsinline></video></div>`);layer.appendChild(S.video);
    S.v=S.video.querySelector('video');
+   S.wave=$(`<canvas width="506" height="36" style="position:absolute;left:984px;top:1062px;opacity:0"></canvas>`);layer.appendChild(S.wave);S.v._wave=S.wave;
  }},
  home:{build(S){
    S.box=$(`<div class="area" style="top:520px;height:580px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end"></div>`);layer.appendChild(S.box);
@@ -258,6 +266,20 @@ const SCENES={
  }},
  end:{build(S){
    S.line=$(`<div style="position:absolute;left:600px;top:760px;width:400px;height:10px;background:var(--accent);transform:scaleX(0)"></div>`);layer.appendChild(S.line);
+   // fast replay of the day before the thank-you
+   const big=(t,c)=>`<div style="font:800 330px/.9 'Inter Tight';letter-spacing:-.05em;color:${c}">${t}</div>`;
+   const ic=(vb,inner,w)=>`<svg viewBox="${vb}" width="${w||520}" style="overflow:visible">${inner}</svg>`;
+   const G2=`fill="none" stroke="${INK}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"`;
+   const items=[big('31.10',INK),big('ADsP',RED),
+     ic('0 0 400 260',`<path d="M20 40 C120 30 150 140 240 150 S330 220 380 230" fill="none" stroke="${RED}" stroke-width="16" stroke-linecap="round"/><circle cx="380" cy="230" r="22" fill="${RED}"/>`),
+     ic('-130 -270 260 290',`<g ${G2}><path d="M-110 0 V-110 L0 -190 L110 -110 V0 Z"/><path d="M-18 0 V-60 H18 V0"/><path d="M-75 -95 H-40 M40 -95 H75"/><path d="M0 -190 V-255 L45 -238 L0 -221"/></g>`,420),
+     ic('-160 -190 320 380',door(true).outerHTML,330),
+     `<div class="frame" style="position:relative;width:1000px;height:560px"><img src="media/hangang.jpg" style="object-position:50% 45%"></div>`,
+     `<img src="media/head.png" style="height:700px">`,
+     big('18:00',RED),
+     ic('-60 -100 120 110',`<g ${G2}><path d="M-42 0 V-52 L0 -88 L42 -52 V0 Z"/><path d="M-11 0 V-28 H11 V0"/></g>`,380),
+     ic('0 0 400 400',`<path d="M250 60 A150 150 0 1 0 340 270 A120 120 0 1 1 250 60 Z" fill="none" stroke="#e8b923" stroke-width="12" stroke-linejoin="round"/>`,380)];
+   S.mont=items.map(h=>{const d=$(`<div style="position:absolute;left:110px;top:200px;width:1380px;height:900px;display:flex;align-items:center;justify-content:center;opacity:0">${h}</div>`);layer.appendChild(d);return d;});
  }}
 };
 
@@ -273,7 +295,12 @@ const STEPS=[
    run(tl,S){tl.to(S.box,{opacity:.15,duration:.6},.2);tl.to(bar,{scaleX:1,duration:1.1,ease:IO},.5);}},
  // so we rewind one week
  {id:'b2',scene:'cal',text:'Поэтому вернёмся на <em>неделю назад</em>.',bat:null,
-   run(tl,S){tl.to(S.box,{opacity:1,duration:.5},0);swapLabel(tl,S.lab,'октябрь',.2);setOdo(S.date,'31.10',tl,.3);}},
+   run(tl,S){tl.to(S.box,{opacity:1,duration:.5},0);swapLabel(tl,S.lab,'октябрь',.2);setOdo(S.date,'31.10',tl,.3);
+     tl.set(S.rw,{opacity:1},.15);tl.fromTo(S.rw.querySelector('.band'),{y:-60},{y:1200,duration:.45,ease:'none',repeat:2},.15);
+     tl.fromTo(S.rw.querySelector('.sl'),{backgroundPositionY:'0px'},{backgroundPositionY:'-120px',duration:1.4,ease:'none'},.15);
+     tl.fromTo(S.rw.querySelector('svg'),{opacity:1},{opacity:.15,duration:.13,repeat:9,yoyo:true,ease:'none'},.15);
+     tl.fromTo(S.box,{x:0},{x:-7,duration:.05,repeat:25,yoyo:true,ease:'none'},.2);tl.set(S.box,{x:0},1.55);
+     tl.to(S.rw,{opacity:0,duration:.3},1.5);}},
  {id:'c1',scene:'cal',chapter:'01|Экзамен',text:'В субботу я сдавал <em>экзамен</em>.',bat:5,
    run(tl,S){swapLabel(tl,S.lab,'суббота',0);tl.to(S.date,{fontSize:190,duration:1.1,ease:IO},.1);tl.fromTo(S.ads,{opacity:0,y:80},{opacity:1,y:0,duration:1.1,ease:OUT},.55);}},
  {id:'d2',scene:'map',text:'Я поехал на автобусе на станцию <em>Кваннару</em>.',hl:'sm',bat:5,
@@ -326,7 +353,7 @@ const STEPS=[
  {id:'f2',scene:'han',text:'Мы играли <em>два часа</em>.',bat:2,batAt:1.8,
    run(tl,S){tl.to(S.shade,{opacity:1,duration:.8},.1);tl.to(S.cnt,{opacity:1,duration:.3},.4);counter(tl,S.num,0,2,1.6,.4,'power2.out');}},
  {id:'f3',scene:'han',text:'Я играл «Сумерки» и <em>«Gravity»</em>.',hl:'sm',video:'v',bat:2,
-   run(tl,S){tl.to([S.photo,S.cnt],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.4);wipe(tl,S.video,.4);}},
+   run(tl,S){tl.to([S.photo,S.cnt],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.4);wipe(tl,S.video,.4);if(LIVE)tl.to(S.wave,{opacity:1,duration:.5},1.3);}},
  // taxi back to Anam
  {id:'g1',scene:'fest',text:'Вечером я играл на <em>пивном фестивале</em>.',hl:'sm',bat:2,
    run(tl,S){camSet(tl,W,CAM.J,0);tl.set(W.dot,{attr:{cx:J[0],cy:J[1]}},0);tl.to(W.el,{opacity:1,duration:.5},.1);rise(tl,S.tag,.2,20);
@@ -340,7 +367,7 @@ const STEPS=[
    run(tl,S){tl.to(S.badge,{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.to(S.head,{yPercent:100,duration:.5,ease:'power2.in'},0);tl.to(S.sparkP,{opacity:0,duration:.3},0);tl.to(S.few,{opacity:1,duration:.3},.5);counter(tl,S.fn,0,10,1.6,.5,'power3.out');
      tl.fromTo(S.dots.children,{opacity:0,scale:.4},{opacity:1,scale:1,duration:.5,ease:'back.out(2)',stagger:.12},.55);}},
  {id:'g4',scene:'fest',text:'Я сыграл <em>три песни</em>.',hl:'side',lay:{side:true},video:'v',bat:1,batAt:2.2,
-   run(tl,S){tl.to([S.few,S.dots],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.35);wipe(tl,S.video,.35);}},
+   run(tl,S){tl.to([S.few,S.dots],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.35);wipe(tl,S.video,.35);if(LIVE)tl.to(S.wave,{opacity:1,duration:.5},1.25);}},
  // the whole loop of the day closes at home
  {id:'h1',scene:'home',chapter:'04|Дом',text:'<em>Дома</em> я учился.',bat:1,
    pre(out){camSet(out,W,CAM.LOOP,.3);},
@@ -351,9 +378,16 @@ const STEPS=[
  {id:'h2',scene:'home',text:'<em>Потому что</em> во вторник был экзамен.',bat:1,
    run(tl,S){tl.to(W.el,{opacity:0,duration:.5},0);rise(tl,[S.lab,S.date],.5);swapLabel(tl,S.lab,'вторник · экзамен',1.5);setOdo(S.date,'03.11',tl,1.6);}},
  {id:'h3',scene:'home',text:'Но я очень устал и <em>рано лёг спать</em>.',hl:'sm',bat:0,batAt:.6,
-   run(tl,S){tl.to(S.box,{opacity:0,y:-30,duration:.6,ease:'power2.in'},0);tl.to(root,{...NIGHT,duration:1.6,ease:'power2.inOut'},1.2);draw(tl,S.moonP,1.8,1.8);}},
- {id:'end',scene:'end',chapter:'',text:'Спасибо!',hl:'xl center',lay:{top:470},bat:null,
-   run(tl,S){tl.to(S.line,{scaleX:1,duration:1.2,ease:IO},.6);}},
+   run(tl,S){tl.to(S.box,{opacity:0,y:-30,duration:.6,ease:'power2.in'},0);tl.to(root,{...NIGHT,duration:1.6,ease:'power2.inOut'},1.2);draw(tl,S.moonP,1.8,1.8);
+     // asleep: the empty battery charges back up
+     const cells=[...bat.querySelectorAll('.cell')];
+     tl.set(cells,{background:GREEN,opacity:0},3.8);tl.set(bat.querySelector('.body'),{clearProps:'borderColor'},3.8);
+     tl.fromTo(bat.querySelector('.bolt'),{opacity:0,scale:.4,transformOrigin:'50% 50%'},{opacity:1,scale:1,duration:.5,ease:'back.out(3)'},3.8);
+     tl.to(cells,{opacity:1,duration:.25,stagger:.4},4.3);}},
+ {id:'end',scene:'end',chapter:'',text:'Спасибо!',hl:'xl center',lay:{top:470},bat:null,hlAt:3.35,
+   run(tl,S){let t=.25;[.36,.33,.31,.3,.28,.28,.3,.26,.26,.32].forEach((d,k)=>{const it=S.mont[k];
+       tl.set(it,{opacity:1},t);tl.fromTo(it,{scale:1.1},{scale:1,duration:d+.05,ease:'power2.out'},t);tl.set(it,{opacity:0},t+d);t+=d;});
+     tl.to(S.line,{scaleX:1,duration:1.2,ease:IO},3.8);}},
 ];
 function swapLabel(tl,lab,text,at){const s=lab.firstChild;
   tl.to(s,{yPercent:-110,duration:.45,ease:'power2.in'},at).add(()=>{s.textContent=text;}).fromTo(s,{yPercent:110},{yPercent:0,duration:.7,ease:OUT});}
@@ -401,9 +435,9 @@ function chapterIn(tl,c,at){const [n,t]=c.split('|');cbigSp[0].textContent=n;cbi
   return at+1.9;}
 // battery: one cell blinks out when energy is spent
 let batLevel=null,batTl=null;
-function setBat(n,anim,delay){const cells=[...bat.querySelectorAll('.cell')],body=bat.querySelector('.body');
+function setBat(n,anim,delay){const cells=[...bat.querySelectorAll('.cell')],body=bat.querySelector('.body'),bolt=bat.querySelector('.bolt');
   if(batTl){batTl.progress(1);batTl=null;}
-  const paint=()=>{cells.forEach((c,k)=>{c.style.opacity=k<n?1:0;c.style.background=n<=1?'var(--accent)':'';});body.style.borderColor=n===0?'var(--accent)':'';};
+  const paint=()=>{cells.forEach((c,k)=>{c.style.opacity=k<n?1:0;c.style.background=n<=1?'var(--accent)':'';});body.style.borderColor=n===0?'var(--accent)':'';bolt.style.opacity=0;};
   if(n===null){gsap.to(bat,{opacity:0,duration:anim?.4:0});batLevel=null;return;}
   if(batLevel===null){paint();gsap.to(bat,{opacity:1,duration:anim?.6:0,delay:anim?.8:0});}
   else if(anim&&n<batLevel){const c=cells[n];batTl=gsap.timeline({delay}).to(c,{opacity:.15,duration:.16,repeat:3,yoyo:true}).to(c,{opacity:0,duration:.3}).add(paint);}
@@ -420,13 +454,25 @@ function playStep(i,animate){
   if(hlEl){const old=hlEl;if(animate)hideWords(tl,old,0);else old.remove();}
   hlEl=headline(st.text,st.hl);place(st,hlEl);
   gsap.set(hlEl.querySelectorAll('.w>span'),{yPercent:115});
-  revealWords(tl,hlEl,animate?.25:0);
+  revealWords(tl,hlEl,animate?(st.hlAt||.25):0);
   st.run(tl,S);
   if(!animate)tl.progress(1);
   return tl;
 }
+// live spectrum of the video's own sound (only over http: a file:// page would be muted by the browser)
+const LIVE=/^https?:$/.test(location.protocol);let AC=null;
+function startWave(v){const cv=v._wave;if(!LIVE||!cv)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume();
+    if(!v._an){const src=AC.createMediaElementSource(v),an=AC.createAnalyser();an.fftSize=256;an.smoothingTimeConstant=.8;src.connect(an);an.connect(AC.destination);v._an=an;}
+  }catch(e){return;}
+  const an=v._an,data=new Uint8Array(an.frequencyBinCount),g=cv.getContext('2d'),w=cv.width,h=cv.height,N=Math.round(w/19),bw=w/N;
+  const loop=()=>{if(!cv.isConnected)return;an.getByteFrequencyData(data);g.clearRect(0,0,w,h);g.fillStyle=RED;
+    for(let k=0;k<N;k++){const m=Math.abs(k-(N-1)/2)/((N-1)/2),bin=2+Math.floor(m*m*60),a=data[bin]/255,bh=Math.max(6,a*a*h*1.1);
+      g.beginPath();g.roundRect(k*bw+bw*.22,(h-Math.min(bh,h))/2,bw*.56,Math.min(bh,h),bw*.28);g.fill();}
+    requestAnimationFrame(loop);};
+  loop();}
 // video with a very short audio fade in/out
-function playVideo(v){v.currentTime=0;v.muted=false;v.volume=0;v._fading=false;v.play().then(()=>gsap.to(v,{volume:1,duration:.3})).catch(()=>{});
+function playVideo(v){v.currentTime=0;v.muted=false;v.volume=0;v._fading=false;startWave(v);v.play().then(()=>gsap.to(v,{volume:1,duration:.3})).catch(()=>{});
   v.ontimeupdate=()=>{if(!v._fading&&v.duration&&v.duration-v.currentTime<.35){v._fading=true;gsap.to(v,{volume:0,duration:.3});}};}
 function stopVideos(){layer.querySelectorAll('video').forEach(v=>{if(!v.paused)gsap.to(v,{volume:0,duration:.25,onComplete:()=>v.pause()});});}
 function themeFor(i){return STEPS[i].id==='h3'?NIGHT:LIGHT;}
@@ -439,6 +485,7 @@ function go(i,opts={}){
   gsap.to(bar,{scaleX:i/(STEPS.length-1),duration:1.2,ease:IO});
   const forwardOne=(i===prev+1)&&!opts.instant;
   const newCh=chapterOf(i), chapterChange=newCh!==curChapter&&newCh!=='';
+  setBat(st.bat,forwardOne,st.batAt||1.4);
   if(forwardOne&&st.scene===sceneName&&chapterChange){
     // chapter starts inside the same scene (01): what is on screen stays, only the colour flips
     const out=gsap.timeline();
@@ -467,7 +514,6 @@ function go(i,opts={}){
     worldSet(i);
     gsap.fromTo(layer,{opacity:0},{opacity:1,duration:.35});
   }
-  setBat(st.bat,forwardOne,st.batAt||1.4);
   if(st.video){const delay=forwardOne?1500:200;setTimeout(()=>{if(STEPS[cur]===st&&S[st.video])playVideo(S[st.video]);},delay);}
   try{history.replaceState(null,'','#'+(i+1));}catch(e){}
 }
