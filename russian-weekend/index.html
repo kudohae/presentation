@@ -140,7 +140,7 @@ const LEGS=[smooth([A,[570,205],[660,300],[780,375],[910,440],[1040,540],[1140,6
             line([G,...STN,J]),
             smooth([J,[835,790],[770,650],[690,500],[600,330],[540,235],A])];
 const CAM={A0:{cx:490,cy:176,h:440},AG:{cx:890,cy:455,h:760},SCH:{cx:1290,cy:580,h:510},G:{cx:1240,cy:660,h:540},
-           J:{cx:870,cy:869,h:600},A:{cx:490,cy:176,h:600},LOOP:{cx:900,cy:520,h:900}};
+           J:{cx:870,cy:869,h:600},A:{cx:490,cy:176,h:600},LOOP:{cx:900,cy:520,h:900},HOME:{cx:455,cy:145,h:340}};
 const W={el:document.getElementById('world'),R:1380/670,cam:{...CAM.A0}};
 (function buildWorld(){
   W.svg=sv('svg',{width:1380,height:670});W.svg.style.cssText=MASK;W.el.appendChild(W.svg);
@@ -159,11 +159,12 @@ const W={el:document.getElementById('world'),R:1380/670,cam:{...CAM.A0}};
    <g class="pin"><circle cx="${A[0]}" cy="${A[1]}" r="20" fill="${INK}"/><text x="${A[0]-40}" y="${A[1]+20}" text-anchor="end" font-size="58" fill="${INK}">Анам</text></g>
    <g class="pin"><circle cx="${G[0]}" cy="${G[1]}" r="20" fill="${INK}"/><text x="${G[0]-30}" y="${G[1]+80}" text-anchor="end" font-size="58" fill="${INK}">Кваннару</text></g>
    <g class="pin"><circle cx="${J[0]}" cy="${J[1]}" r="20" fill="${INK}"/><text x="${J[0]-42}" y="${J[1]+20}" text-anchor="end" font-size="58" fill="${INK}">Чаян</text></g>
+   <circle class="ring" cx="${A[0]}" cy="${A[1]}" r="20" fill="none" stroke="${RED}" stroke-width="6" opacity="0"/>
    <circle class="dot" r="28" fill="${RED}" stroke="#f6f4f0" stroke-width="10"/>`;
   W.legs=[...W.svg.querySelectorAll('.leg')];W.len=W.legs.map(p=>p.getTotalLength());
   W.legs.forEach((p,k)=>p.style.strokeDasharray=W.len[k]);
   W.stn=[...W.svg.querySelectorAll('.stn')];W.pins=[...W.svg.querySelectorAll('.pin')];W.dot=W.svg.querySelector('.dot');
-  W.school=[...W.svg.querySelectorAll('.school path')];W.house=[...W.svg.querySelectorAll('.house path')];W.hlab=W.svg.querySelector('.hlab');
+  W.school=[...W.svg.querySelectorAll('.school path')];W.house=[...W.svg.querySelectorAll('.house path')];W.hlab=W.svg.querySelector('.hlab');W.ring=W.svg.querySelector('.ring');
   gsap.set(W.stn,{transformOrigin:'50% 50%'});
   setVB(W);
 })();
@@ -337,8 +338,11 @@ const STEPS=[
    run(tl,S){tl.to([S.few,S.dots],{opacity:0,y:-30,duration:.5,ease:'power2.in'},0);tl.set(S.video,{opacity:1},.35);wipe(tl,S.video,.35);}},
  // the whole loop of the day closes at home
  {id:'h1',scene:'home',chapter:'04|Дом',text:'<em>Дома</em> я учился.',bat:1,
-   pre(out){camSet(out,W,CAM.A,.3);},
-   run(tl,S){tl.to(W.el,{opacity:1,duration:.6},0);camTo(tl,W,CAM.LOOP,1.9,.2);draw(tl,W.house,1.0,1.1,.15);rise(tl,W.hlab,1.7,15);}},
+   pre(out){camSet(out,W,CAM.LOOP,.3);},
+   // the whole loop of the day, then the camera pushes into home
+   run(tl,S){tl.to(W.el,{opacity:1,duration:.6},0);camTo(tl,W,CAM.HOME,1.8,1.3);
+     draw(tl,W.house,1.0,2.4,.15);rise(tl,W.hlab,3.0,15);
+     tl.fromTo(W.ring,{attr:{r:20},opacity:.9},{attr:{r:140},opacity:0,duration:1.2,ease:'power2.out'},3.1);}},
  {id:'h2',scene:'home',text:'Во <em>вторник</em> был экзамен.',bat:1,
    run(tl,S){tl.to(W.el,{opacity:0,duration:.5},0);rise(tl,[S.lab,S.date],.5);swapLabel(tl,S.lab,'вторник · экзамен',1.5);setOdo(S.date,'03.11',tl,1.6);}},
  {id:'h3',scene:'home',text:'Но я очень устал и <em>рано лёг спать</em>.',hl:'sm',bat:0,batAt:.6,
@@ -354,7 +358,7 @@ const IDX=id=>STEPS.findIndex(s=>s.id===id);
 function worldSpec(i){const id=STEPS[i].id;
   return {legs:i<IDX('d2')?0:i<IDX('f1')?1:i<IDX('g1')?2:3,
     vis:{d2:1,d3:1,g1:.1,h1:1}[id]||0,
-    cam:{d2:CAM.AG,d3:CAM.SCH,f1:CAM.J,f2:CAM.J,f3:CAM.J,g1:CAM.A,h1:CAM.LOOP}[id]||CAM.AG,
+    cam:{d2:CAM.AG,d3:CAM.SCH,f1:CAM.J,f2:CAM.J,f3:CAM.J,g1:CAM.A,h1:CAM.HOME}[id]||CAM.AG,
     school:i>=IDX('d3'),house:i>=IDX('h1')};}
 function worldSet(i){const s=worldSpec(i);
   gsap.set(W.el,{opacity:s.vis});Object.assign(W.cam,s.cam);setVB(W);
