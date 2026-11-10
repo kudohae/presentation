@@ -116,8 +116,10 @@ const MASK=`overflow:hidden;-webkit-mask-image:${SOFT};-webkit-mask-composite:so
 const NS='http://www.w3.org/2000/svg', INK='#141417', RED='#e0362a', GREEN='#1f9d55';
 function sv(tag,attrs,html){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(html)e.innerHTML=html;return e;}
 function door(missing){
-  return sv('g',{},`<rect x="-100" y="-170" width="200" height="340" rx="12" fill="#fff" stroke="${INK}" stroke-width="6" vector-effect="non-scaling-stroke"/>
-   <rect x="-72" y="-142" width="144" height="116" rx="8" fill="none" stroke="${INK}" stroke-opacity=".25" stroke-width="4" vector-effect="non-scaling-stroke"/>
+  // stall door: partition posts on both sides, a gap under the door, a WC plate
+  return sv('g',{},`<path d="M-130 -175 V170 M130 -175 V170 M-146 170 H-114 M114 170 H146" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+   <rect x="-100" y="-165" width="200" height="295" rx="6" fill="#fff" stroke="${INK}" stroke-width="6" vector-effect="non-scaling-stroke"/>
+   <text x="0" y="-98" text-anchor="middle" font-size="40" fill="${INK}" fill-opacity=".45" letter-spacing="4">WC</text>
    <circle cx="66" cy="16" r="9" fill="${INK}"/>
    <rect class="latch" x="44" y="-24" width="44" height="26" rx="6" fill="${missing?'none':INK}" stroke="${missing?RED:INK}" stroke-width="4" ${missing?'stroke-dasharray="7 6"':''} vector-effect="non-scaling-stroke"/>`);
 }
