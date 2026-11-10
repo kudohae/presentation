@@ -266,20 +266,6 @@ const SCENES={
  }},
  end:{build(S){
    S.line=$(`<div style="position:absolute;left:600px;top:760px;width:400px;height:10px;background:var(--accent);transform:scaleX(0)"></div>`);layer.appendChild(S.line);
-   // fast replay of the day before the thank-you
-   const big=(t,c)=>`<div style="font:800 330px/.9 'Inter Tight';letter-spacing:-.05em;color:${c}">${t}</div>`;
-   const ic=(vb,inner,w)=>`<svg viewBox="${vb}" width="${w||520}" style="overflow:visible">${inner}</svg>`;
-   const G2=`fill="none" stroke="${INK}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"`;
-   const items=[big('31.10',INK),big('ADsP',RED),
-     ic('0 0 400 260',`<path d="M20 40 C120 30 150 140 240 150 S330 220 380 230" fill="none" stroke="${RED}" stroke-width="16" stroke-linecap="round"/><circle cx="380" cy="230" r="22" fill="${RED}"/>`),
-     ic('-130 -270 260 290',`<g ${G2}><path d="M-110 0 V-110 L0 -190 L110 -110 V0 Z"/><path d="M-18 0 V-60 H18 V0"/><path d="M-75 -95 H-40 M40 -95 H75"/><path d="M0 -190 V-255 L45 -238 L0 -221"/></g>`,420),
-     ic('-160 -190 320 380',door(true).outerHTML,330),
-     `<div class="frame" style="position:relative;width:1000px;height:560px"><img src="media/hangang.jpg" style="object-position:50% 45%"></div>`,
-     `<img src="media/head.png" style="height:700px">`,
-     big('18:00',RED),
-     ic('-60 -100 120 110',`<g ${G2}><path d="M-42 0 V-52 L0 -88 L42 -52 V0 Z"/><path d="M-11 0 V-28 H11 V0"/></g>`,380),
-     ic('0 0 400 400',`<path d="M250 60 A150 150 0 1 0 340 270 A120 120 0 1 1 250 60 Z" fill="none" stroke="#e8b923" stroke-width="12" stroke-linejoin="round"/>`,380)];
-   S.mont=items.map(h=>{const d=$(`<div style="position:absolute;left:110px;top:200px;width:1380px;height:900px;display:flex;align-items:center;justify-content:center;opacity:0">${h}</div>`);layer.appendChild(d);return d;});
  }}
 };
 
@@ -384,10 +370,8 @@ const STEPS=[
      tl.set(cells,{background:GREEN,opacity:0},3.8);tl.set(bat.querySelector('.body'),{clearProps:'borderColor'},3.8);
      tl.fromTo(bat.querySelector('.bolt'),{opacity:0,scale:.4,transformOrigin:'50% 50%'},{opacity:1,scale:1,duration:.5,ease:'back.out(3)'},3.8);
      tl.to(cells,{opacity:1,duration:.25,stagger:.4},4.3);}},
- {id:'end',scene:'end',chapter:'',text:'Спасибо!',hl:'xl center',lay:{top:470},bat:null,hlAt:3.35,
-   run(tl,S){let t=.25;[.36,.33,.31,.3,.28,.28,.3,.26,.26,.32].forEach((d,k)=>{const it=S.mont[k];
-       tl.set(it,{opacity:1},t);tl.fromTo(it,{scale:1.1},{scale:1,duration:d+.05,ease:'power2.out'},t);tl.set(it,{opacity:0},t+d);t+=d;});
-     tl.to(S.line,{scaleX:1,duration:1.2,ease:IO},3.8);}},
+ {id:'end',scene:'end',chapter:'',text:'Спасибо!',hl:'xl center',lay:{top:470},bat:null,
+   run(tl,S){tl.to(S.line,{scaleX:1,duration:1.2,ease:IO},.6);}},
 ];
 function swapLabel(tl,lab,text,at){const s=lab.firstChild;
   tl.to(s,{yPercent:-110,duration:.45,ease:'power2.in'},at).add(()=>{s.textContent=text;}).fromTo(s,{yPercent:110},{yPercent:0,duration:.7,ease:OUT});}
