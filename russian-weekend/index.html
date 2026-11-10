@@ -301,7 +301,12 @@ const STEPS=[
    run(tl,S){tl.set(S.first,{opacity:1},0);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',bat:4,
    run(tl,S){const l=S.first.querySelector('.latch');camTo(tl,S,{cx:-330,cy:200,h:180},1.4,.1);
-     tl.to(l,{y:-30,opacity:0,duration:.5,ease:'power2.in'},1.2).add(()=>{l.setAttribute('fill','none');l.setAttribute('stroke',RED);l.setAttribute('stroke-dasharray','7 6');}).to(l,{y:0,opacity:1,duration:.6,ease:OUT});}},
+     // the latch flickers in place and is gone; only a faint dashed mark of where it should be remains
+     tl.to(l,{opacity:.1,duration:.07,repeat:2,yoyo:true,ease:'none'},1.3);
+     tl.to(l,{opacity:.1,duration:.05,repeat:4,yoyo:true,ease:'none'},1.75);
+     tl.to(l,{opacity:0,duration:.12,ease:'none'},2.05)
+       .add(()=>{l.setAttribute('fill','none');l.setAttribute('stroke',RED);l.setAttribute('stroke-dasharray','7 6');})
+       .to(l,{opacity:1,duration:.5,ease:'power1.inOut'},2.75);}},
  {id:'e3',scene:'wc',text:'И здесь тоже… и здесь <em>тоже</em>!',bat:4,
    run(tl,S){camTo(tl,S,{cx:0,cy:200,h:520},1.2,0);tl.to(S.struct,{opacity:1,duration:.8},.4);
      S.rows[0].slice(1).forEach((d,c)=>tl.fromTo(d,{opacity:0,x:-130+c*260+60},{opacity:1,x:-130+c*260,duration:.9,ease:OUT},.55+c*.16));
