@@ -31,6 +31,9 @@
 ::view-transition-new(deck-title){animation:none}
   ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s}
   .tt{display:inline-block}
+  a.row{position:relative}
+  .load{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--fg);transform-origin:0 50%;transform:scaleX(0);transition:transform .25s ease-out}
+  a.row.loading{cursor:progress}
   .cover{position:fixed;left:0;right:0;z-index:10;pointer-events:none}
   .cover-title{position:fixed;z-index:11;margin:0;pointer-events:none;transform-origin:0 0;white-space:nowrap}
   @media (max-width:520px){main{padding:48px 16px 72px}a.row{flex-direction:column;gap:6px}}
@@ -84,12 +87,36 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 })();
 
 const VT='CSSViewTransitionRule' in window;
-list.addEventListener('click',e=>{
+let busy=false;
+list.addEventListener('click',async e=>{
   const a=e.target.closest('a.row');if(!a||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+  e.preventDefault();if(busy)return;busy=true;
+  await preload(a);
   document.querySelectorAll('.tt').forEach(t=>t.style.viewTransitionName='');
-  if(VT){a.querySelector('.tt').style.viewTransitionName='deck-title';return;}
-  e.preventDefault();cover(a);
+  if(VT){a.querySelector('.tt').style.viewTransitionName='deck-title';location.href=a.href;}
+  else cover(a);
 });
+// load the presentation first (its page, script, fonts, images and videos go into the browser cache),
+// then run the transition, so the animation does not stutter while files are still arriving
+async function preload(a){
+  const bar=document.createElement('span');bar.className='load';a.appendChild(bar);a.classList.add('loading');
+  const date=a.querySelector('.date'),old=date.textContent,show=f=>{bar.style.transform=`scaleX(${f})`;date.textContent=Math.round(f*100)+'%';};
+  show(0);
+  const base=new URL(a.href,location.href);
+  const work=(async()=>{
+    const html=await (await fetch(base)).text();
+    const urls=new Set();
+    for(const m of html.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']|url\(\s*['"]?([^)'"]+)['"]?\s*\)|["'`](media\/[^"'`$]+)["'`]/g)){
+      const u=m[1]||m[2]||m[3];try{const x=new URL(u,base);if(x.origin===location.origin&&x.href!==base.href)urls.add(x.href);}catch(_){}
+    }
+    const list=[...urls];let done=0;show(.05);
+    await Promise.all(list.map(u=>fetch(u).then(r=>r.blob()).catch(()=>{}).finally(()=>show(.05+.95*(++done)/list.length))));
+  })();
+  // never wait forever: go after 10 s even if something is still loading
+  await Promise.race([work.catch(()=>{}),new Promise(r=>setTimeout(r,10000))]);
+  show(1);await new Promise(r=>setTimeout(r,180));
+  addEventListener('pageshow',()=>{bar.remove();a.classList.remove('loading');date.textContent=old;busy=false;},{once:true});
+}
 // fallback: the clicked row opens up into the deck's background colour, then the deck loads on the same colour
 function cover(a){
   const r=a.getBoundingClientRect(),tt=a.querySelector('.tt'),tr=tt.getBoundingClientRect(),cs=getComputedStyle(tt);
