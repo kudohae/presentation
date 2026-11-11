@@ -155,6 +155,7 @@ const W={el:document.getElementById('world'),R:1380/670,cam:{...CAM.A0}};
    ${LEGS.map(d=>`<path class="leg" d="${d}" fill="none" stroke="${RED}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
    ${STN.map(p=>`<circle class="stn" cx="${p[0]}" cy="${p[1]}" r="13" style="fill:var(--bg)" stroke="${RED}" stroke-width="7"/>`).join('')}
    <g class="school" fill="none" stroke="${INK}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" transform="translate(1290 623)">
+     <rect class="sdoor" x="-18" y="-60" width="36" height="60" fill="${RED}" stroke="none" opacity="0"/>
      <path vector-effect="non-scaling-stroke" d="M-110 0 V-110 L0 -190 L110 -110 V0 Z"/><path vector-effect="non-scaling-stroke" d="M-18 0 V-60 H18 V0"/>
      <path vector-effect="non-scaling-stroke" d="M-75 -95 H-40 M40 -95 H75"/><path vector-effect="non-scaling-stroke" d="M0 -190 V-255 L45 -238 L0 -221"/></g>
    <g class="house" fill="none" stroke="${INK}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" transform="translate(${A[0]} ${A[1]-34})">
@@ -168,7 +169,7 @@ const W={el:document.getElementById('world'),R:1380/670,cam:{...CAM.A0}};
   W.legs=[...W.svg.querySelectorAll('.leg')];W.len=W.legs.map(p=>p.getTotalLength());
   W.legs.forEach((p,k)=>p.style.strokeDasharray=W.len[k]);
   W.stn=[...W.svg.querySelectorAll('.stn')];W.pins=[...W.svg.querySelectorAll('.pin')];W.dot=W.svg.querySelector('.dot');
-  W.school=[...W.svg.querySelectorAll('.school path')];W.house=[...W.svg.querySelectorAll('.house path')];W.hlab=W.svg.querySelector('.hlab');W.ring=W.svg.querySelector('.ring');
+  W.school=[...W.svg.querySelectorAll('.school path')];W.house=[...W.svg.querySelectorAll('.house path')];W.hlab=W.svg.querySelector('.hlab');W.ring=W.svg.querySelector('.ring');W.sdoor=W.svg.querySelector('.sdoor');
   gsap.set(W.stn,{transformOrigin:'50% 50%'});
   setVB(W);
 })();
@@ -312,8 +313,12 @@ const STEPS=[
    run(tl,S){tl.to(W.dot,{opacity:0,duration:.4},0);camTo(tl,W,CAM.SCH,1.6,.1);drawNS(tl,W.school,1.2,.7,.12);}},
  // school door → toilet door: the camera pushes into the door and the cut lands on the stall door
  {id:'e1',scene:'wc',chapter:'02|Случай в туалете',text:'В школе я пошёл в <em>туалет</em>.',bat:4,
-   flashAt:1.05,pre(out){camTo(out,W,{cx:1290,cy:593,h:76.3},1.5,0,'power3.inOut');out.to(W.el,{opacity:0,duration:.35},1.35);return 1.3;},
-   onBuild(S){gsap.fromTo(S.first,{opacity:0},{opacity:1,duration:.3});},
+   // through the school door: its inside turns red, the camera goes through it and the red becomes the chapter screen;
+   // when the colour comes back, the stall door is standing there
+   flashAt:1.45,pre(out){out.to(W.sdoor,{opacity:1,duration:.7,ease:'power1.in'},.2);
+     camTo(out,W,{cx:1290,cy:590,h:13},1.45,0,'power2.in');out.set(W.el,{opacity:0},1.8);out.set(W.sdoor,{opacity:0},1.85);
+     out.add(()=>gsap.fromTo(S.first,{opacity:0,scale:.9,transformOrigin:'50% 50%'},{opacity:1,scale:1,duration:.8,ease:OUT}),2.9);return 1.8;},
+   onBuild(S){gsap.set(S.first,{opacity:0});},
    run(tl,S){tl.set(S.first,{opacity:1},0);}},
  {id:'e2',scene:'wc',text:'Но <em>замка</em> не было!',bat:4,
    run(tl,S){const l=S.first.querySelector('.latch');camTo(tl,S,{cx:-330,cy:200,h:180},1.4,.1);
@@ -415,7 +420,7 @@ function worldSet(i){const s=worldSpec(i);
   gsap.set(W.stn,{opacity:s.legs>=2?1:0,scale:1});
   W.pins.forEach((p,k)=>gsap.set(p,{opacity:k<=s.legs?1:0,y:0}));
   const pr=(ps,on)=>ps.forEach(p=>{p.style.strokeDasharray=p.getTotalLength();p.style.strokeDashoffset=on?0:p.getTotalLength();p.style.opacity=on?1:0;});
-  pr(W.school,s.school);if(s.school)W.school.forEach(p=>p.style.strokeDasharray='none');pr(W.house,s.house);gsap.set(W.hlab,{opacity:s.house?1:0,y:0});
+  gsap.set(W.sdoor,{opacity:0});pr(W.school,s.school);if(s.school)W.school.forEach(p=>p.style.strokeDasharray='none');pr(W.house,s.house);gsap.set(W.hlab,{opacity:s.house?1:0,y:0});
   gsap.set(W.dot,{opacity:0});}
 
 // ===================== engine =====================
