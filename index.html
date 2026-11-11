@@ -23,6 +23,16 @@
   .date{color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
   .msg{color:var(--dim);padding:24px 8px}
   .msg a{color:inherit}
+  /* opening a presentation: browsers with cross-document view transitions fly the title into the deck,
+     others get a cover in the deck's background colour */
+  @view-transition{navigation:auto}
+  ::view-transition-group(deck-title){animation-duration:.75s;animation-timing-function:cubic-bezier(.7,0,.15,1)}
+::view-transition-old(deck-title){display:none}
+::view-transition-new(deck-title){animation:none}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s}
+  .tt{display:inline-block}
+  .cover{position:fixed;left:0;right:0;z-index:10;pointer-events:none}
+  .cover-title{position:fixed;z-index:11;margin:0;pointer-events:none;transform-origin:0 0;white-space:nowrap}
   @media (max-width:520px){main{padding:48px 16px 72px}a.row{flex-direction:column;gap:6px}}
 </style>
 </head>
@@ -48,10 +58,11 @@ async function gh(path){
   try{localStorage.setItem(key,JSON.stringify({t:Date.now(),v}));}catch(e){}
   return v;
 }
-async function titleOf(name){
-  try{const r=await fetch(encodeURIComponent(name)+'/');if(!r.ok)return null;
-    const t=new DOMParser().parseFromString(await r.text(),'text/html').querySelector('title');
-    return t&&t.textContent.trim()||null;}catch(e){return null;}
+// title and background colour of a presentation, read from its index.html
+async function metaOf(name){
+  try{const r=await fetch(encodeURIComponent(name)+'/');if(!r.ok)return {};
+    const d=new DOMParser().parseFromString(await r.text(),'text/html'),t=d.querySelector('title'),c=d.querySelector('meta[name="theme-color"]');
+    return {title:t&&t.textContent.trim()||null,bg:c&&c.content||null};}catch(e){return {};}
 }
 async function dateOf(name){
   try{const c=await gh('/commits?per_page=1&path='+encodeURIComponent(name));
@@ -65,12 +76,35 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
   try{items=(await gh('/contents/')).filter(x=>x.type==='dir'&&!/^[_.]/.test(x.name));}
   catch(e){list.innerHTML=`<li class="msg">목록을 불러오지 못했어요. 잠시 뒤 새로고침하거나 <a href="https://github.com/${REPO}">저장소</a>에서 폴더를 열어 주세요.</li>`;return;}
   if(!items.length){list.innerHTML='<li class="msg">아직 발표가 없어요.</li>';return;}
-  const rows=await Promise.all(items.map(async x=>({name:x.name,title:await titleOf(x.name),date:await dateOf(x.name)})));
+  const rows=await Promise.all(items.map(async x=>{const m=await metaOf(x.name);return {name:x.name,title:m.title,bg:m.bg,date:await dateOf(x.name)};}));
   rows.sort((a,b)=>(b.date||0)-(a.date||0)||a.name.localeCompare(b.name));
-  list.innerHTML=rows.map(r=>`<li><a class="row" href="${encodeURIComponent(r.name)}/">
-      <span class="title">${esc(r.title||r.name)}<span class="folder">/${esc(r.name)}</span></span>
+  list.innerHTML=rows.map(r=>`<li><a class="row" href="${encodeURIComponent(r.name)}/" data-bg="${esc(r.bg||'#ffffff')}">
+      <span class="title"><span class="tt">${esc(r.title||r.name)}</span><span class="folder">/${esc(r.name)}</span></span>
       <span class="date">${fmt(r.date)}</span></a></li>`).join('');
 })();
+
+const VT='CSSViewTransitionRule' in window;
+list.addEventListener('click',e=>{
+  const a=e.target.closest('a.row');if(!a||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+  document.querySelectorAll('.tt').forEach(t=>t.style.viewTransitionName='');
+  if(VT){a.querySelector('.tt').style.viewTransitionName='deck-title';return;}
+  e.preventDefault();cover(a);
+});
+// fallback: the clicked row opens up into the deck's background colour, then the deck loads on the same colour
+function cover(a){
+  const r=a.getBoundingClientRect(),tt=a.querySelector('.tt'),tr=tt.getBoundingClientRect(),cs=getComputedStyle(tt);
+  const c=document.createElement('div');c.className='cover';c.style.background=a.dataset.bg;c.style.top=r.top+'px';c.style.height=r.height+'px';
+  const t=document.createElement('div');t.className='cover-title';t.textContent=tt.textContent;
+  Object.assign(t.style,{left:tr.left+'px',top:tr.top+'px',font:cs.font,letterSpacing:cs.letterSpacing,color:'#141417'});
+  document.body.append(c,t);
+  const ease='cubic-bezier(.7,0,.15,1)',H=innerHeight;
+  c.animate([{top:r.top+'px',height:r.height+'px'},{top:'0px',height:H+'px'}],{duration:520,easing:ease,fill:'forwards'});
+  const k=Math.min(3,(innerWidth*.6)/tr.width);
+  t.animate([{transform:'none',opacity:1},{transform:`translate(${innerWidth/2-tr.left-tr.width*k/2}px,${H/2-tr.top-tr.height*k/2}px) scale(${k})`,opacity:0}],{duration:520,easing:ease,fill:'forwards'});
+  setTimeout(()=>{location.href=a.href;},500);
+}
+// coming back (also from the back/forward cache): clear the cover and the transition name
+addEventListener('pageshow',()=>{document.querySelectorAll('.cover,.cover-title').forEach(x=>x.remove());document.querySelectorAll('.tt').forEach(t=>t.style.viewTransitionName='');});
 </script>
 </body>
 </html>
