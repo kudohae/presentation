@@ -172,6 +172,12 @@ const W={el:document.getElementById('world'),R:1380/670,cam:{...CAM.A0}};
   gsap.set(W.stn,{transformOrigin:'50% 50%'});
   setVB(W);
 })();
+// draw paths that use non-scaling strokes: their dashes are measured on screen, so the dash
+// length follows the camera zoom, and the dash is removed once the line is complete
+function drawNS(tl,paths,dur,at,st){paths.forEach((p,i)=>{const L=p.getTotalLength(),o={t:0};
+  tl.set(p,{opacity:1},at+i*st);
+  tl.to(o,{t:1,duration:dur,ease:'power2.inOut',onUpdate:()=>{const k=1380/(W.cam.h*W.R)*1.001+.05,Ls=L*k;p.style.strokeDasharray=`${Ls} ${Ls}`;p.style.strokeDashoffset=Ls*(1-o.t);},
+    onComplete:()=>{p.style.strokeDasharray='none';p.style.strokeDashoffset=0;}},at+i*st);});}
 // a leg of the trip: the line draws, the dot rides it, the camera rides with the dot
 function drive(tl,k,at,dur,h){const P=W.legs[k],L=W.len[k],o={t:0};
   tl.set(W.dot,{opacity:1},at);
@@ -303,7 +309,7 @@ const STEPS=[
    run(tl,S){camSet(tl,W,CAM.A0,0);tl.to(W.el,{opacity:1,duration:.6},0);rise(tl,S.tag,.3,20);
      drive(tl,0,.7,3.4,520);camTo(tl,W,CAM.AG,1.7,4.1);rise(tl,W.pins[1],4.4,20);}},
  {id:'d3',scene:'map',text:'Экзамен был в <em>средней школе</em>.',hl:'sm',bat:4,batAt:2.4,
-   run(tl,S){tl.to(W.dot,{opacity:0,duration:.4},0);camTo(tl,W,CAM.SCH,1.6,.1);draw(tl,W.school,1.2,.7,.12);}},
+   run(tl,S){tl.to(W.dot,{opacity:0,duration:.4},0);camTo(tl,W,CAM.SCH,1.6,.1);drawNS(tl,W.school,1.2,.7,.12);}},
  // school door → toilet door: the camera pushes into the door and the cut lands on the stall door
  {id:'e1',scene:'wc',chapter:'02|Случай в туалете',text:'В школе я пошёл в <em>туалет</em>.',bat:4,
    flashAt:1.05,pre(out){camTo(out,W,{cx:1290,cy:593,h:76.3},1.5,0,'power3.inOut');out.to(W.el,{opacity:0,duration:.35},1.35);return 1.3;},
@@ -409,7 +415,7 @@ function worldSet(i){const s=worldSpec(i);
   gsap.set(W.stn,{opacity:s.legs>=2?1:0,scale:1});
   W.pins.forEach((p,k)=>gsap.set(p,{opacity:k<=s.legs?1:0,y:0}));
   const pr=(ps,on)=>ps.forEach(p=>{p.style.strokeDasharray=p.getTotalLength();p.style.strokeDashoffset=on?0:p.getTotalLength();p.style.opacity=on?1:0;});
-  pr(W.school,s.school);pr(W.house,s.house);gsap.set(W.hlab,{opacity:s.house?1:0,y:0});
+  pr(W.school,s.school);if(s.school)W.school.forEach(p=>p.style.strokeDasharray='none');pr(W.house,s.house);gsap.set(W.hlab,{opacity:s.house?1:0,y:0});
   gsap.set(W.dot,{opacity:0});}
 
 // ===================== engine =====================
